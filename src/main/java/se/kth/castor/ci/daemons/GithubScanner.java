@@ -57,11 +57,13 @@ public class GithubScanner extends Thread {
                         process(commit);
                     } catch (Exception e) {
                         logger.error("error while repairing: " + commit.getCommitUrl());
+                        e.printStackTrace();
                     }
 
                 lastFetched = now;
             } catch (Exception e) {
                 logger.error("error while processing: " + new Date(lastFetched) + " to " + new Date(now));
+                e.printStackTrace();
                 lastFetched = now;
             }
 

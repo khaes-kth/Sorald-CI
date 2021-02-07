@@ -46,7 +46,7 @@ public class SoraldAdapter {
             throws ParseException, GitAPIException, IOException {
         logger.info("repairing: " + commit.getCommitUrl());
 
-        File repoDir = cloneRepo(commit.getRepoUrl());
+        File repoDir = cloneRepo(commit);
         logger.info("repo cloned: " + commit.getRepoName());
 
         Map<String, Set<String>> ruleToIntroducingFiles = getIntroducedViolations(repoDir);
@@ -94,7 +94,8 @@ public class SoraldAdapter {
         return Arrays.asList(patchDir.listFiles());
     }
 
-    private File cloneRepo(String repoUrl) throws IOException, GitAPIException {
+    private File cloneRepo(SelectedCommit commit)
+            throws IOException, GitAPIException {
         File repoDir = new File(tmpdir + File.separator + "repo");
 
         if (repoDir.exists())
@@ -103,9 +104,12 @@ public class SoraldAdapter {
         repoDir.mkdirs();
 
         Git git = Git.cloneRepository()
-                .setURI(repoUrl)
+                .setURI(commit.getRepoName())
                 .setDirectory(repoDir)
                 .call();
+
+        git.checkout().setName(commit.getCommitId()).call();
+
         git.close();
 
         return repoDir;
