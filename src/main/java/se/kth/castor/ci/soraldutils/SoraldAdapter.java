@@ -212,7 +212,7 @@ public class SoraldAdapter {
 
             JSONArray warningLocations = (JSONArray) jo.get("warningLocations");
             for (int j = 0; j < warningLocations.size(); j++) {
-                jo = (JSONObject) warningLocations.get(i);
+                jo = (JSONObject) warningLocations.get(j);
                 String location = jo.get("violationSpecifier").toString();
                 violationLocations.add(location);
             }
