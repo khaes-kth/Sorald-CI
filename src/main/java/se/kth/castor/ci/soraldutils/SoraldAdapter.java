@@ -115,7 +115,7 @@ public class SoraldAdapter {
             try {
                 Process p = processBuilder.start();
                 int res = p.waitFor();
-                if (res == 0) {
+                if (res != 0) {
                     logger.error("cannot apply patch");
                     return null;
                 }
