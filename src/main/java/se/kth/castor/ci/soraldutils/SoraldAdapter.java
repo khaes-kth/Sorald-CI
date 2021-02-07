@@ -10,6 +10,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonar.java.testing.FilesUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import se.kth.castor.ci.githubapi.commits.models.SelectedCommit;
@@ -26,6 +27,9 @@ import java.util.stream.Collectors;
 
 @ComponentScan
 public class SoraldAdapter {
+    private static final String SORALD_CI_REPO = "sorald-ci";
+    private static final String SORALD_URL = "https://github.com/khaes-kth/Sorald-CI.git";
+
     private static final Logger logger = LoggerFactory.getLogger(SoraldAdapter.class);
     private static SoraldAdapter _instance;
 
@@ -46,11 +50,13 @@ public class SoraldAdapter {
             throws ParseException, GitAPIException, IOException {
         logger.info("repairing: " + commit.getCommitUrl());
 
-        File repoDir = cloneRepo(commit);
+        File repoDir = cloneRepo(commit.getRepoUrl(), commit.getCommitId(), "repo");
         logger.info("repo cloned: " + commit.getRepoName());
 
         Map<String, Set<String>> ruleToIntroducingFiles = getIntroducedViolations(repoDir);
         logger.info("number of introduced rules: " + ruleToIntroducingFiles.entrySet().size());
+
+        List<String> forkUrls = new ArrayList<String>();
 
         ruleToIntroducingFiles.entrySet().forEach(e -> {
             String rule = e.getKey();
@@ -75,14 +81,103 @@ public class SoraldAdapter {
 
             logger.info("patch files generated for rule: " + rule);
 
-            createFork(patchedFiles, rule, commit);
+            String forkUrl = createFork(patchedFiles, rule, commit, repoDir);
+
+            if(forkUrl != null)
+                forkUrls.add(forkUrl);
         });
-        return null;
+
+        return forkUrls;
     }
 
-    private void createFork(List<File> patchedFiles, String rule, SelectedCommit commit) {
+    private String createFork
+            (
+                    List<File> patchedFiles,
+                    String rule,
+                    SelectedCommit commit,
+                    File repoDir
+            ) {
         logger.info("patched files for " + commit.getCommitUrl() + ":");
         patchedFiles.forEach(x -> logger.info(x.getName()));
+
+        for (File patch : patchedFiles) {
+            ProcessBuilder processBuilder =
+                    new ProcessBuilder("git", "apply", patch.getAbsolutePath())
+                            .directory(repoDir).inheritIO();
+
+            try {
+                Process p = processBuilder.start();
+                p.waitFor();
+            } catch (InterruptedException | IOException e) {
+                logger.error("Error while executing git command to apply patch");
+                return null;
+            }
+        }
+
+        logger.info("all patches applied");
+
+        File soraldRepo = null;
+        try {
+            soraldRepo = cloneRepo(SORALD_URL, null, SORALD_CI_REPO);
+        } catch (Exception e) {
+            logger.error("cannot clone sorald-ci");
+            return null;
+        }
+
+        String copiedFixedRepoDir = soraldRepo.getPath() + File.separator + "fixed_repo";
+
+        try {
+            FileUtils.copyDirectory(repoDir,
+                    new File(copiedFixedRepoDir));
+        } catch (IOException e) {
+            logger.error("cannot copy patched repo into sorald-ci");
+        }
+
+        try {
+            FileUtils.deleteDirectory(new File(copiedFixedRepoDir + File.separator + ".git"));
+        } catch (IOException e) {
+            logger.error("error while removing .git folder");
+            return null;
+        }
+
+        String newBranch = "fixed_" + commit.getCommitId();
+        try {
+            ProcessBuilder processBuilder =
+                    new ProcessBuilder("cat",
+                            commit.toString() + System.lineSeparator() + "rule: " + rule,
+                            ">", copiedFixedRepoDir + File.separator + "fixed_repo_info.txt");
+            Process p = processBuilder.start();
+            p.waitFor();
+
+            processBuilder =
+                    new ProcessBuilder("git", "add", "--all")
+                            .directory(new File(copiedFixedRepoDir)).inheritIO();
+            p = processBuilder.start();
+            p.waitFor();
+
+            processBuilder =
+                    new ProcessBuilder("git", "checkout", "-b", newBranch)
+                            .directory(soraldRepo).inheritIO();
+            p = processBuilder.start();
+            p.waitFor();
+
+            processBuilder =
+                    new ProcessBuilder("git", "commit", "-m", "fixed")
+                            .directory(soraldRepo).inheritIO();
+            p = processBuilder.start();
+            p.waitFor();
+
+            processBuilder =
+                    new ProcessBuilder("git", "push", "origin", newBranch)
+                            .directory(soraldRepo).inheritIO();
+            p = processBuilder.start();
+            p.waitFor();
+        } catch(Exception e){
+            logger.error("error while pushing new fork");
+            return null;
+        }
+
+        return SORALD_URL.replace(".git", "") + "/tree/" + newBranch;
     }
 
     // returns patch files
@@ -102,9 +197,9 @@ public class SoraldAdapter {
         return Arrays.asList(patchDir.listFiles());
     }
 
-    private File cloneRepo(SelectedCommit commit)
+    private File cloneRepo(String repoUrl, String commitId, String dirname)
             throws IOException, GitAPIException {
-        File repoDir = new File(tmpdir + File.separator + "repo");
+        File repoDir = new File(tmpdir + File.separator + dirname);
 
         if (repoDir.exists())
             FileUtils.deleteDirectory(repoDir);
@@ -112,11 +207,12 @@ public class SoraldAdapter {
         repoDir.mkdirs();
 
         Git git = Git.cloneRepository()
-                .setURI(commit.getRepoUrl())
+                .setURI(repoUrl)
                 .setDirectory(repoDir)
                 .call();
 
-        git.checkout().setName(commit.getCommitId()).call();
+        if(commitId != null)
+            git.checkout().setName(commitId).call();
 
         git.close();
 
