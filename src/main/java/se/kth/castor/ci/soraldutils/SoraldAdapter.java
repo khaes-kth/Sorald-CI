@@ -152,6 +152,7 @@ public class SoraldAdapter {
                             .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
             Map<String, Long> oldFileToViolationCnt =
+                    !previousRuleToLocations.containsKey(ruleNumber) ? new HashMap<String, Long>() :
                     previousRuleToLocations.get(ruleNumber).stream()
                             .map(specifier -> specifier.split(File.pathSeparator)[1])
                             .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
