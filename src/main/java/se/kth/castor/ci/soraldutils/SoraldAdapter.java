@@ -82,11 +82,11 @@ public class SoraldAdapter {
     private List<File> repair(String rule, File repoDir) {
         String[] args = new String[]{
                 Constants.REPAIR_COMMAND_NAME,
-                "--originalFilesPath", repoDir.getPath(),
-                "--ruleKeys", rule,
-                "--workspace", tmpdir,
-                "--gitRepoPath", repoDir.getPath(),
-                "--prettyPrintingStrategy", "SNIPER" };
+                Constants.ARG_ORIGINAL_FILES_PATH, repoDir.getPath(),
+                Constants.ARG_RULE_KEYS, rule,
+                Constants.ARG_WORKSPACE, tmpdir,
+                Constants.ARG_GIT_REPO_PATH, repoDir.getPath(),
+                Constants.ARG_PRETTY_PRINTING_STRATEGY, "SNIPER" };
 
         Main.main(args);
 
