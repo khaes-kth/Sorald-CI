@@ -81,7 +81,7 @@ public class SoraldAdapter {
 
             logger.info("patch files generated for rule: " + rule);
 
-            String forkUrl = createFork(patchedFiles, rule, commit, repoDir);
+            String forkUrl = createFork(patchedFiles, rule, commit);
 
             if (forkUrl != null)
                 forkUrls.add(forkUrl);
@@ -94,11 +94,18 @@ public class SoraldAdapter {
             (
                     List<File> patchedFiles,
                     String rule,
-                    SelectedCommit commit,
-                    File repoDir
+                    SelectedCommit commit
             ) {
         logger.info("patched files for " + commit.getCommitUrl() + ":");
         patchedFiles.forEach(x -> logger.info(x.getName()));
+
+        File repoDir = null;
+        try {
+            repoDir = cloneRepo(commit.getRepoUrl(), commit.getCommitId(), "repo");
+        } catch (Exception e) {
+            logger.error("could not clone repo");
+            return null;
+        }
 
         for (File patch : patchedFiles) {
             ProcessBuilder processBuilder =
@@ -107,7 +114,11 @@ public class SoraldAdapter {
 
             try {
                 Process p = processBuilder.start();
-                p.waitFor();
+                int res = p.waitFor();
+                if (res == 0) {
+                    logger.error("cannot apply patch");
+                    return null;
+                }
             } catch (InterruptedException | IOException e) {
                 logger.error("Error while executing git command to apply patch");
                 return null;
@@ -222,11 +233,18 @@ public class SoraldAdapter {
                 Constants.ARG_GIT_REPO_PATH, repoDir.getPath(),
                 Constants.ARG_PRETTY_PRINTING_STRATEGY, "SNIPER"};
 
+        File gitPatchesDir = new File(tmpdir + File.separator + "SoraldGitPatches");
+        if(gitPatchesDir.exists()) {
+            try {
+                FileUtils.deleteDirectory(gitPatchesDir);
+            } catch (IOException e) {
+                logger.error("cannot remove SoraldGitPatches dir");
+            }
+        }
+
         Main.main(args);
 
-        File patchDir = new File(tmpdir + File.separator + "SoraldGitPatches");
-
-        return Arrays.asList(patchDir.listFiles());
+        return Arrays.asList(gitPatchesDir.listFiles());
     }
 
     private File cloneRepo(String repoUrl, String commitId, String dirname)
