@@ -119,8 +119,6 @@ public class SoraldAdapter {
         File copyRepoDir = new File(Files.createTempDirectory("repo_copy").toString());
         FileUtils.copyDirectory(repoDir, copyRepoDir);
 
-        logger.info(FileUtils.sizeOfDirectory(copyRepoDir) + "");
-
         Map<String, Set<String>> lastRuleToLocations = listViolationLocations(copyRepoDir);
 //        Map<String, Set<String>> lastRuleToLocations = null;
 
@@ -128,8 +126,6 @@ public class SoraldAdapter {
         ObjectId previousCommitId = git.getRepository().resolve("HEAD^");
         git.checkout().setName(previousCommitId.getName()).call();
         git.close();
-
-        logger.info(FileUtils.sizeOfDirectory(copyRepoDir) + "");
 
         Map<String, Set<String>> previousRuleToLocations = listViolationLocations(copyRepoDir);
 //        Map<String, Set<String>> previousRuleToLocations = null;

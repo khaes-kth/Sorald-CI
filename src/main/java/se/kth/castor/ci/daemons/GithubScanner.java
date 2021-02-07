@@ -62,7 +62,6 @@ public class GithubScanner extends Thread {
                 lastFetched = now;
             } catch (Exception e) {
                 logger.error("error while processing: " + new Date(lastFetched) + " to " + new Date(now));
-                e.printStackTrace();
                 lastFetched = now;
             }
 
