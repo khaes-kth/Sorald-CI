@@ -120,7 +120,12 @@ public class SoraldAdapter {
      */
     private Map<String, Set<String>> getIntroducedViolations(File repoDir)
             throws IOException, GitAPIException, ParseException {
-        File copyRepoDir = new File(Files.createTempDirectory("repo_copy").toString());
+        File copyRepoDir = new File(tmpdir + File.separator + "copy_repo");
+        if(copyRepoDir.exists())
+            FileUtils.deleteDirectory(copyRepoDir);
+
+        copyRepoDir.mkdirs();
+
         FileUtils.copyDirectory(repoDir, copyRepoDir);
 
         Map<String, Set<String>> lastRuleToLocations = listViolationLocations(copyRepoDir);
@@ -167,8 +172,18 @@ public class SoraldAdapter {
     private Map<String, Set<String>> listViolationLocations(File repoDir) throws IOException, ParseException {
         Map<String, Set<String>> ret = new HashMap<String, Set<String>>();
 
-        File stats = new File(Files.createTempFile("mining_stats", ".json").toString()),
-                miningTmpFile = new File(Files.createTempDirectory("mining_tmp").toString());
+        File stats = new File(tmpdir + File.separator + "mining_stats.json"),
+                miningTmpFile = new File(tmpdir + File.separator + "mining_tmp_dir");
+
+        if(stats.exists())
+            stats.delete();
+
+        if(miningTmpFile.exists())
+            FileUtils.deleteDirectory(miningTmpFile);
+
+        stats.createNewFile();
+
+        miningTmpFile.mkdirs();
 
         String[] args =
                 new String[]{
