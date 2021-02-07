@@ -40,6 +40,7 @@ public class GithubScanner extends Thread {
         this.dataFile = dataFile;
         this.rules = rules;
         this.tmpdir = tmpdir;
+        this.lastFetched = new Date().getTime();
     }
 
     @Override
@@ -60,12 +61,12 @@ public class GithubScanner extends Thread {
                         e.printStackTrace();
                     }
 
-                lastFetched = now;
             } catch (Exception e) {
                 logger.error("error while processing: " + new Date(lastFetched) + " to " + new Date(now));
                 e.printStackTrace();
-                lastFetched = now;
             }
+
+            lastFetched = now;
 
             try {
                 TimeUnit.MILLISECONDS.sleep(FREQUENCY);
