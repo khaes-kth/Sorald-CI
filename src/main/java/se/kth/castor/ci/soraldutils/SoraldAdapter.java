@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 @ComponentScan
 public class SoraldAdapter {
-    private static final String SORALD_CI_REPO = "sorald-ci";
+    private static final String SORALD_CI_REPO = "Sorald-CI";
     private static final String SORALD_URL = "git@github.com:khaes-kth/Sorald-CI.git";
 
     private static final Logger logger = LoggerFactory.getLogger(SoraldAdapter.class);
@@ -127,7 +127,7 @@ public class SoraldAdapter {
         try {
             ProcessBuilder processBuilder =
                     new ProcessBuilder("git", "clone", SORALD_URL)
-                            .directory(soraldRepo).inheritIO();
+                            .directory(new File(tmpdir)).inheritIO();
             Process p = processBuilder.start();
             int res = p.waitFor();
             if(res != 0){
