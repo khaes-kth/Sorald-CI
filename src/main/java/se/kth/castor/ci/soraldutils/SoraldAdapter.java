@@ -81,6 +81,7 @@ public class SoraldAdapter {
     // returns patch files
     private List<File> repair(String rule, File repoDir) {
         String[] args = new String[]{
+                Constants.REPAIR_COMMAND_NAME,
                 "--originalFilesPath", repoDir.getPath(),
                 "--ruleKeys", rule,
                 "--workspace", tmpdir,
@@ -161,6 +162,9 @@ public class SoraldAdapter {
                     .filter(x -> !oldFileToViolationCnt.containsKey(x.getKey())
                             || x.getValue() > oldFileToViolationCnt.get(x.getKey()))
                     .map(Map.Entry::getKey).collect(Collectors.toSet()));
+
+            if(ret.containsKey(ruleNumber) && ret.get(ruleNumber).size() == 0)
+                ret.remove(ruleNumber);
         }
 
         return ret;
