@@ -116,11 +116,18 @@ public class SoraldAdapter {
 
         logger.info("all patches applied");
 
-        File soraldRepo = null;
+        File soraldRepo = new File(tmpdir + File.separator + SORALD_CI_REPO);
+        try {
+            FileUtils.deleteDirectory(soraldRepo);
+        } catch (IOException e) {
+            logger.error("error while removing old sorald-ci dir");
+            return null;
+        }
+
         try {
             ProcessBuilder processBuilder =
                     new ProcessBuilder("git", "clone", SORALD_URL)
-                            .directory(new File(tmpdir + File.separator + SORALD_CI_REPO)).inheritIO();
+                            .directory(soraldRepo).inheritIO();
             Process p = processBuilder.start();
             int res = p.waitFor();
             if(res != 0){
@@ -128,7 +135,7 @@ public class SoraldAdapter {
                 return null;
             }
         } catch (Exception e) {
-            logger.error("error while clonning sorald-ci");
+            logger.error("error while cloning sorald-ci");
             return null;
         }
 
