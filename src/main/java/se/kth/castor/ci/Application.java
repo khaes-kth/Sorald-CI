@@ -40,6 +40,9 @@ public class Application implements ApplicationRunner {
     @Value("${tmpdir}")
     private String tmpdir;
 
+    @Value("${repos.path}")
+    private String reposLstPath;
+
     private File dataFile;
 
     private GithubScanner githubScanner;
@@ -51,7 +54,7 @@ public class Application implements ApplicationRunner {
 
     private void runDaemons() throws IOException {
         HashSet<String> repos =
-                new HashSet<String>(FileUtils.readLines((new ClassPathResource("target_repos.txt").getFile()),
+                new HashSet<String>(FileUtils.readLines(new File(reposLstPath),
                 "UTF-8"));
         githubScanner = new GithubScanner(GithubScanner.FetchMode.ALL, repos, dataFile,
                 Arrays.asList(rulesStr.split(",")), tmpdir);
