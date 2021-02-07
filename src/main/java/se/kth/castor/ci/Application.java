@@ -1,6 +1,8 @@
 package se.kth.castor.ci;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -14,28 +16,36 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import se.kth.castor.ci.daemons.GithubScanner;
+import se.kth.castor.ci.soraldutils.SoraldAdapter;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 
 @Configuration
 @ComponentScan
 @EnableAutoConfiguration
 public class Application implements ApplicationRunner {
+    private static final Logger logger = LoggerFactory.getLogger(Application.class);
+
     @Value("${data.filepath}")
     private String dataFilePath;
 
     @Value("${rules}")
     private String rulesStr;
 
+    @Value("${tmpdir}")
+    private String tmpdir;
+
     private File dataFile;
 
     private GithubScanner githubScanner;
 
     public static void main(String[] args) throws IOException {
+        logger.info("APPLICATION STARTED AT: " + new Date());
         SpringApplication.run(Application.class, args);
     }
 
@@ -44,7 +54,7 @@ public class Application implements ApplicationRunner {
                 new HashSet<String>(FileUtils.readLines((new ClassPathResource("target_repos.txt").getFile()),
                 "UTF-8"));
         githubScanner = new GithubScanner(GithubScanner.FetchMode.ALL, repos, dataFile,
-                Arrays.asList(rulesStr.split(",")));
+                Arrays.asList(rulesStr.split(",")), tmpdir);
         githubScanner.setDaemon(true);
         githubScanner.start();
     }

@@ -25,45 +25,64 @@ public class GithubScanner extends Thread {
     private long lastFetched = -1L;
     private File dataFile;
     private List<String> rules;
+    private String tmpdir;
 
-    public GithubScanner(FetchMode fetchMode, Set<String> repos, File dataFile, List<String> rules) {
+    public GithubScanner
+            (
+                    FetchMode fetchMode,
+                    Set<String> repos,
+                    File dataFile,
+                    List<String> rules,
+                    String tmpdir
+            ) {
         this.fetchMode = fetchMode;
         this.repos = repos;
         this.dataFile = dataFile;
         this.rules = rules;
+        this.tmpdir = tmpdir;
     }
 
     @Override
     public void run() {
-        while(true){
+        while (true) {
             long now = new Date().getTime();
+
             try {
                 List<SelectedCommit> selectedCommits = fetch(
                         lastFetched, now
                 );
 
-                for(SelectedCommit commit : selectedCommits)
-                    process(commit);
+                for (SelectedCommit commit : selectedCommits)
+                    try {
+                        process(commit);
+                    } catch (Exception e) {
+                        logger.error("error while repairing: " + commit.getCommitUrl());
+                    }
 
                 lastFetched = now;
-
-                TimeUnit.MILLISECONDS.sleep(FREQUENCY);
             } catch (Exception e) {
                 logger.error("error while processing: " + new Date(lastFetched) + " to " + new Date(now));
                 e.printStackTrace();
                 lastFetched = now;
             }
+
+            try {
+                TimeUnit.MILLISECONDS.sleep(FREQUENCY);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     private List<SelectedCommit> fetch(long startTime, long endTime) throws Exception {
-        return GithubAPICommitAdapter.getInstance().getSelectedCommits(startTime, endTime, fetchMode, repos);
+        return GithubAPICommitAdapter.getInstance()
+                .getSelectedCommits(startTime, endTime, fetchMode, repos);
     }
 
     private void process(SelectedCommit commit) throws IOException, GitAPIException, ParseException {
-        List<String> fixedCommitUrl = SoraldAdapter.getInstance().repair(commit, rules);
+        List<String> fixedCommitUrl = SoraldAdapter.getInstance(tmpdir).repair(commit, rules);
 
-        if(fixedCommitUrl != null) {
+        if (fixedCommitUrl != null) {
             logger.info("repaired: " + commit.getCommitUrl());
             FileUtils.writeStringToFile(dataFile, new Date() + "," + fixedCommitUrl + System.lineSeparator(),
                     "UTF-8", true);

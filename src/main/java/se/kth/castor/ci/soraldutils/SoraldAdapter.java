@@ -29,19 +29,21 @@ public class SoraldAdapter {
     private static final Logger logger = LoggerFactory.getLogger(SoraldAdapter.class);
     private static SoraldAdapter _instance;
 
-    @Value("${tmpdir}")
     private String tmpdir;
 
-    public static SoraldAdapter getInstance() {
+    public SoraldAdapter(String tmpdir) {
+        this.tmpdir = tmpdir;
+    }
+
+    public static SoraldAdapter getInstance(String tmpdir) {
         if (_instance == null)
-            _instance = new SoraldAdapter();
+            _instance = new SoraldAdapter(tmpdir);
         return _instance;
     }
 
-    // returns list of fixed-commits generated
+    // returns list of fixed-commit generated urls
     public List<String> repair(SelectedCommit commit, List<String> rules)
             throws ParseException, GitAPIException, IOException {
-        logger.info(tmpdir);
         logger.info("repairing: " + commit.getCommitUrl());
 
         File repoDir = cloneRepo(commit.getRepoUrl());
@@ -55,13 +57,16 @@ public class SoraldAdapter {
             if (!rules.contains(rule))
                 return;
 
+            List<File> patchedFiles = repair(rule, repoDir);
+
             Set<String> violationIntroducingFiles = ruleToIntroducingFiles.get(rule);
 
-            List<File> patchedFiles = repair(rule, repoDir);
             patchedFiles = patchedFiles.stream()
-                    .filter(x -> violationIntroducingFiles.stream().anyMatch(y -> y.contains(x.getName())))
+                    .filter(x -> violationIntroducingFiles.stream()
+                            .anyMatch(y -> y.contains(x.getName())))
                     .collect(Collectors.toList());
-            logger.info("patch files generated: " + rule);
+
+            logger.info("patch files generated for rule: " + rule);
 
             createFork(patchedFiles, rule, commit);
         });
@@ -69,17 +74,30 @@ public class SoraldAdapter {
     }
 
     private void createFork(List<File> patchedFiles, String rule, SelectedCommit commit) {
-
+        logger.info("patched files for " + commit.getCommitUrl() + ":");
+        patchedFiles.forEach(x -> logger.info(x.getName()));
     }
 
+    // returns patch files
     private List<File> repair(String rule, File repoDir) {
-        return null;
+        String[] args = new String[]{
+                "--originalFilesPath", repoDir.getPath(),
+                "--ruleKeys", rule,
+                "--workspace", tmpdir,
+                "--gitRepoPath", repoDir.getPath(),
+                "--prettyPrintingStrategy", "SNIPER" };
+
+        Main.main(args);
+
+        File patchDir = new File(tmpdir + File.separator + "SoraldGitPatches");
+
+        return Arrays.asList(patchDir.listFiles());
     }
 
     private File cloneRepo(String repoUrl) throws IOException, GitAPIException {
         File repoDir = new File(tmpdir + File.separator + "repo");
 
-        if(repoDir.exists())
+        if (repoDir.exists())
             FileUtils.deleteDirectory(repoDir);
 
         repoDir.mkdirs();
@@ -88,6 +106,7 @@ public class SoraldAdapter {
                 .setURI(repoUrl)
                 .setDirectory(repoDir)
                 .call();
+        git.close();
 
         return repoDir;
     }
@@ -100,13 +119,20 @@ public class SoraldAdapter {
         File copyRepoDir = new File(Files.createTempDirectory("repo_copy").toString());
         FileUtils.copyDirectory(repoDir, copyRepoDir);
 
+        logger.info(FileUtils.sizeOfDirectory(copyRepoDir) + "");
+
         Map<String, Set<String>> lastRuleToLocations = listViolationLocations(copyRepoDir);
+//        Map<String, Set<String>> lastRuleToLocations = null;
 
         Git git = Git.open(copyRepoDir);
         ObjectId previousCommitId = git.getRepository().resolve("HEAD^");
         git.checkout().setName(previousCommitId.getName()).call();
+        git.close();
+
+        logger.info(FileUtils.sizeOfDirectory(copyRepoDir) + "");
 
         Map<String, Set<String>> previousRuleToLocations = listViolationLocations(copyRepoDir);
+//        Map<String, Set<String>> previousRuleToLocations = null;
 
         FileUtils.deleteDirectory(copyRepoDir);
 
