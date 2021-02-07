@@ -159,7 +159,7 @@ public class SoraldAdapter {
         try {
             try {
                 FileUtils.writeStringToFile(new File(copiedFixedRepoDir + File.separator + "fixed_repo_info.txt"),
-                        commit.getCommitId() + System.lineSeparator() + "rule: " + rule, "UTF-8");
+                        commit.toString() + System.lineSeparator() + "rule: " + rule, "UTF-8");
             } catch (Exception e) {
                 logger.error("cannot cat the fix info");
             }
@@ -185,7 +185,7 @@ public class SoraldAdapter {
             }
 
             processBuilder =
-                    new ProcessBuilder("git", "commit", "-m", "fixed")
+                    new ProcessBuilder("git", "commit", "-m", "\"fixed\"")
                             .directory(soraldRepo).inheritIO();
             p = processBuilder.start();
             res = p.waitFor();
