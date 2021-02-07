@@ -63,7 +63,14 @@ public class SoraldAdapter {
 
             patchedFiles = patchedFiles.stream()
                     .filter(x -> violationIntroducingFiles.stream()
-                            .anyMatch(y -> y.contains(x.getName())))
+                            .anyMatch(y -> {
+                                try {
+                                    return FileUtils.readFileToString(x, "UTF-8").contains(y);
+                                } catch (IOException ioException) {
+                                    ioException.printStackTrace();
+                                    return false;
+                                }
+                            }))
                     .collect(Collectors.toList());
 
             logger.info("patch files generated for rule: " + rule);
@@ -86,7 +93,7 @@ public class SoraldAdapter {
                 Constants.ARG_RULE_KEYS, rule,
                 Constants.ARG_WORKSPACE, tmpdir,
                 Constants.ARG_GIT_REPO_PATH, repoDir.getPath(),
-                Constants.ARG_PRETTY_PRINTING_STRATEGY, "SNIPER" };
+                Constants.ARG_PRETTY_PRINTING_STRATEGY, "SNIPER"};
 
         Main.main(args);
 
@@ -122,7 +129,7 @@ public class SoraldAdapter {
     private Map<String, Set<String>> getIntroducedViolations(File repoDir)
             throws IOException, GitAPIException, ParseException {
         File copyRepoDir = new File(tmpdir + File.separator + "copy_repo");
-        if(copyRepoDir.exists())
+        if (copyRepoDir.exists())
             FileUtils.deleteDirectory(copyRepoDir);
 
         copyRepoDir.mkdirs();
@@ -154,16 +161,16 @@ public class SoraldAdapter {
 
             Map<String, Long> oldFileToViolationCnt =
                     !previousRuleToLocations.containsKey(ruleNumber) ? new HashMap<String, Long>() :
-                    previousRuleToLocations.get(ruleNumber).stream()
-                            .map(specifier -> specifier.split(File.pathSeparator)[1])
-                            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+                            previousRuleToLocations.get(ruleNumber).stream()
+                                    .map(specifier -> specifier.split(File.pathSeparator)[1])
+                                    .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
             ret.put(ruleNumber, newFileToViolationCnt.entrySet().stream()
                     .filter(x -> !oldFileToViolationCnt.containsKey(x.getKey())
                             || x.getValue() > oldFileToViolationCnt.get(x.getKey()))
                     .map(Map.Entry::getKey).collect(Collectors.toSet()));
 
-            if(ret.containsKey(ruleNumber) && ret.get(ruleNumber).size() == 0)
+            if (ret.containsKey(ruleNumber) && ret.get(ruleNumber).size() == 0)
                 ret.remove(ruleNumber);
         }
 
@@ -180,10 +187,10 @@ public class SoraldAdapter {
         File stats = new File(tmpdir + File.separator + "mining_stats.json"),
                 miningTmpFile = new File(tmpdir + File.separator + "mining_tmp_dir");
 
-        if(stats.exists())
+        if (stats.exists())
             stats.delete();
 
-        if(miningTmpFile.exists())
+        if (miningTmpFile.exists())
             FileUtils.deleteDirectory(miningTmpFile);
 
         stats.createNewFile();
