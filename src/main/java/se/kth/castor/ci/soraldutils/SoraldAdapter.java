@@ -83,7 +83,7 @@ public class SoraldAdapter {
 
             String forkUrl = createFork(patchedFiles, rule, commit, repoDir);
 
-            if(forkUrl != null)
+            if (forkUrl != null)
                 forkUrls.add(forkUrl);
         });
 
@@ -130,7 +130,7 @@ public class SoraldAdapter {
                             .directory(new File(tmpdir)).inheritIO();
             Process p = processBuilder.start();
             int res = p.waitFor();
-            if(res != 0){
+            if (res != 0) {
                 logger.error("cannot clone sorald-ci");
                 return null;
             }
@@ -155,25 +155,21 @@ public class SoraldAdapter {
             return null;
         }
 
-        String newBranch = "fixed_" + commit.getCommitId();
+        String newBranch = "fixed_" + commit.getCommitId() + "_" + rule;
         try {
-            ProcessBuilder processBuilder =
-                    new ProcessBuilder("cat",
-                            commit.toString() + ",rule: " + rule,
-                            ">", copiedFixedRepoDir + File.separator + "fixed_repo_info.txt");
-            Process p = processBuilder.start();
-            int res = p.waitFor();
-            if(res != 0){
+            try {
+                FileUtils.writeStringToFile(new File(copiedFixedRepoDir + File.separator + "fixed_repo_info.txt"),
+                        commit.getCommitId() + System.lineSeparator() + "rule: " + rule, "UTF-8");
+            } catch (Exception e) {
                 logger.error("cannot cat the fix info");
-                return null;
             }
 
-            processBuilder =
+            ProcessBuilder processBuilder =
                     new ProcessBuilder("git", "add", "--all")
                             .directory(new File(copiedFixedRepoDir)).inheritIO();
-            p = processBuilder.start();
-            res = p.waitFor();
-            if(res != 0){
+            Process p = processBuilder.start();
+            int res = p.waitFor();
+            if (res != 0) {
                 logger.error("cannot git add all");
                 return null;
             }
@@ -183,7 +179,7 @@ public class SoraldAdapter {
                             .directory(soraldRepo).inheritIO();
             p = processBuilder.start();
             res = p.waitFor();
-            if(res != 0){
+            if (res != 0) {
                 logger.error("cannot checkout new branch");
                 return null;
             }
@@ -193,7 +189,7 @@ public class SoraldAdapter {
                             .directory(soraldRepo).inheritIO();
             p = processBuilder.start();
             res = p.waitFor();
-            if(res != 0){
+            if (res != 0) {
                 logger.error("cannot commit fixed");
                 return null;
             }
@@ -203,12 +199,12 @@ public class SoraldAdapter {
                             .directory(soraldRepo).inheritIO();
             p = processBuilder.start();
             res = p.waitFor();
-            if(res != 0){
+            if (res != 0) {
                 logger.error("cannot push new branch");
                 return null;
             }
 
-        } catch(Exception e){
+        } catch (Exception e) {
             logger.error("error while pushing new fork");
             return null;
         }
@@ -247,7 +243,7 @@ public class SoraldAdapter {
                 .setDirectory(repoDir)
                 .call();
 
-        if(commitId != null)
+        if (commitId != null)
             git.checkout().setName(commitId).call();
 
         git.close();
