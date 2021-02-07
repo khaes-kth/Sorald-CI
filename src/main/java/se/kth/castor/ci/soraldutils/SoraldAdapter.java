@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 @ComponentScan
 public class SoraldAdapter {
     private static final String SORALD_CI_REPO = "sorald-ci";
-    private static final String SORALD_URL = "https://github.com/khaes-kth/Sorald-CI.git";
+    private static final String SORALD_URL = "git@github.com:khaes-kth/Sorald-CI.git";
 
     private static final Logger logger = LoggerFactory.getLogger(SoraldAdapter.class);
     private static SoraldAdapter _instance;
@@ -144,34 +144,55 @@ public class SoraldAdapter {
         try {
             ProcessBuilder processBuilder =
                     new ProcessBuilder("cat",
-                            commit.toString() + System.lineSeparator() + "rule: " + rule,
+                            commit.toString() + ",rule: " + rule,
                             ">", copiedFixedRepoDir + File.separator + "fixed_repo_info.txt");
             Process p = processBuilder.start();
-            p.waitFor();
+            int res = p.waitFor();
+            if(res != 0){
+                logger.error("cannot cat the fix info");
+                return null;
+            }
 
             processBuilder =
                     new ProcessBuilder("git", "add", "--all")
                             .directory(new File(copiedFixedRepoDir)).inheritIO();
             p = processBuilder.start();
-            p.waitFor();
+            res = p.waitFor();
+            if(res != 0){
+                logger.error("cannot git add all");
+                return null;
+            }
 
             processBuilder =
                     new ProcessBuilder("git", "checkout", "-b", newBranch)
                             .directory(soraldRepo).inheritIO();
             p = processBuilder.start();
-            p.waitFor();
+            res = p.waitFor();
+            if(res != 0){
+                logger.error("cannot checkout new branch");
+                return null;
+            }
 
             processBuilder =
                     new ProcessBuilder("git", "commit", "-m", "fixed")
                             .directory(soraldRepo).inheritIO();
             p = processBuilder.start();
-            p.waitFor();
+            res = p.waitFor();
+            if(res != 0){
+                logger.error("cannot commit fixed");
+                return null;
+            }
 
             processBuilder =
                     new ProcessBuilder("git", "push", "origin", newBranch)
                             .directory(soraldRepo).inheritIO();
             p = processBuilder.start();
-            p.waitFor();
+            res = p.waitFor();
+            if(res != 0){
+                logger.error("cannot push new branch");
+                return null;
+            }
+
         } catch(Exception e){
             logger.error("error while pushing new fork");
             return null;
