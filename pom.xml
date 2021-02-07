@@ -14,6 +14,25 @@
     <artifactId>sorald-ci</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <repositories>
+        <repository>
+            <id>tdurieux-maven-repository-snapshot</id>
+            <name>tdurieux.github.io maven-repository</name>
+            <url>https://tdurieux.github.io/maven-repository/snapshots/</url>
+            <snapshots><enabled>true</enabled><updatePolicy>always</updatePolicy></snapshots>
+
+        </repository>
+        <repository>
+            <id>tdurieux-maven-repository-release</id>
+            <name>tdurieux.github.io maven-repository</name>
+            <url>https://tdurieux.github.io/maven-repository/releases/</url>
+        </repository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+    </repositories>
+
     <build>
         <plugins>
             <plugin>
