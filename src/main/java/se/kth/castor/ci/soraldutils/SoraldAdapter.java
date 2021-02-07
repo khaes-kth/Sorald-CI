@@ -118,9 +118,17 @@ public class SoraldAdapter {
 
         File soraldRepo = null;
         try {
-            soraldRepo = cloneRepo(SORALD_URL, null, SORALD_CI_REPO);
+            ProcessBuilder processBuilder =
+                    new ProcessBuilder("git", "clone", SORALD_URL)
+                            .directory(new File(tmpdir + File.separator + SORALD_CI_REPO)).inheritIO();
+            Process p = processBuilder.start();
+            int res = p.waitFor();
+            if(res != 0){
+                logger.error("cannot clone sorald-ci");
+                return null;
+            }
         } catch (Exception e) {
-            logger.error("cannot clone sorald-ci");
+            logger.error("error while clonning sorald-ci");
             return null;
         }
 
