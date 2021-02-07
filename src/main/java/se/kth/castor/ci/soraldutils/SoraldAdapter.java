@@ -104,7 +104,7 @@ public class SoraldAdapter {
         repoDir.mkdirs();
 
         Git git = Git.cloneRepository()
-                .setURI(commit.getRepoName())
+                .setURI(commit.getRepoUrl())
                 .setDirectory(repoDir)
                 .call();
 
