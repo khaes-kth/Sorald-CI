@@ -81,7 +81,7 @@ public class GithubScanner extends Thread {
                 .getSelectedCommits(startTime, endTime, fetchMode, repos);
     }
 
-    private void process(SelectedCommit commit) throws IOException, GitAPIException, ParseException {
+    private void process(SelectedCommit commit) throws IOException, GitAPIException, ParseException, InterruptedException {
         List<String> fixedCommitUrl = SoraldAdapter.getInstance(tmpdir).repair(commit, rules);
 
         if (fixedCommitUrl != null) {

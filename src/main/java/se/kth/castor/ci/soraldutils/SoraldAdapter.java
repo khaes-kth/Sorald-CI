@@ -47,7 +47,7 @@ public class SoraldAdapter {
 
     // returns list of fixed-commit generated urls
     public List<String> repair(SelectedCommit commit, List<String> rules)
-            throws ParseException, GitAPIException, IOException {
+            throws ParseException, GitAPIException, IOException, InterruptedException {
         logger.info("repairing: " + commit.getCommitUrl());
 
         File repoDir = cloneRepo(commit.getRepoUrl(), commit.getCommitId(), "repo");
@@ -234,7 +234,7 @@ public class SoraldAdapter {
                 Constants.ARG_PRETTY_PRINTING_STRATEGY, "SNIPER"};
 
         File gitPatchesDir = new File(tmpdir + File.separator + "SoraldGitPatches");
-        if(gitPatchesDir.exists()) {
+        if (gitPatchesDir.exists()) {
             try {
                 FileUtils.deleteDirectory(gitPatchesDir);
             } catch (IOException e) {
@@ -273,7 +273,7 @@ public class SoraldAdapter {
      * @return A map from ruleNumber to the set of files with more violation locations in the new version.
      */
     private Map<String, Set<String>> getIntroducedViolations(File repoDir)
-            throws IOException, GitAPIException, ParseException {
+            throws IOException, GitAPIException, ParseException, InterruptedException {
         File copyRepoDir = new File(tmpdir + File.separator + "copy_repo");
         if (copyRepoDir.exists())
             FileUtils.deleteDirectory(copyRepoDir);
@@ -285,10 +285,15 @@ public class SoraldAdapter {
         Map<String, Set<String>> lastRuleToLocations = listViolationLocations(copyRepoDir);
 //        Map<String, Set<String>> lastRuleToLocations = null;
 
-        Git git = Git.open(copyRepoDir);
-        ObjectId previousCommitId = git.getRepository().resolve("HEAD^");
-        git.checkout().setName(previousCommitId.getName()).call();
-        git.close();
+        ProcessBuilder processBuilder =
+                new ProcessBuilder("git", "checkout", "HEAD^")
+                        .directory(copyRepoDir).inheritIO();
+        Process p = processBuilder.start();
+        int res = p.waitFor();
+        if (res != 0) {
+            logger.error("cannot checkout to head^");
+            return new HashMap<String, Set<String>>();
+        }
 
         Map<String, Set<String>> previousRuleToLocations = listViolationLocations(copyRepoDir);
 //        Map<String, Set<String>> previousRuleToLocations = null;
