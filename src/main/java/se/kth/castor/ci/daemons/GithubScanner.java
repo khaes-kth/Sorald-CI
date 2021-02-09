@@ -84,11 +84,9 @@ public class GithubScanner extends Thread {
     private void process(SelectedCommit commit) throws IOException, GitAPIException, ParseException, InterruptedException {
         List<String> fixedCommitUrl = SoraldAdapter.getInstance(tmpdir).repair(commit, rules);
 
-        if (fixedCommitUrl != null) {
-            logger.info("repaired: " + commit.getCommitUrl());
-            FileUtils.writeStringToFile(dataFile, new Date() + "," + fixedCommitUrl + System.lineSeparator(),
-                    "UTF-8", true);
-        }
+        logger.info("repaired: " + commit.getCommitUrl());
+        FileUtils.writeStringToFile(dataFile, new Date() + "," + commit.getCommitUrl() + ","
+                        + fixedCommitUrl + System.lineSeparator(), "UTF-8", true);
     }
 
     public enum FetchMode {

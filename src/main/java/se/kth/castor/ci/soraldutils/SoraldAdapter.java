@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 
 @ComponentScan
 public class SoraldAdapter {
+    private static final String SORALD_GIT_PATCHES_DIR = "SoraldGitPatches";
     private static final String SORALD_CI_REPO = "Sorald-CI";
     private static final String SORALD_URL = "git@github.com:khaes-kth/Sorald-CI.git";
 
@@ -157,6 +158,7 @@ public class SoraldAdapter {
                     new File(copiedFixedRepoDir));
         } catch (IOException e) {
             logger.error("cannot copy patched repo into sorald-ci");
+            return null;
         }
 
         try {
@@ -166,7 +168,15 @@ public class SoraldAdapter {
             return null;
         }
 
-        String newBranch = "fixed_" + commit.getCommitId() + "_" + rule;
+        try {
+            FileUtils.copyDirectory(new File(tmpdir + File.separator + SORALD_GIT_PATCHES_DIR),
+                    new File(copiedFixedRepoDir + File.separator + SORALD_GIT_PATCHES_DIR));
+        } catch (IOException e) {
+            logger.error("cannot copy patched repo into sorald-ci");
+            return null;
+        }
+
+        String newBranch = "fixed_" + commit.getCommitUrl() + "_" + rule;
         try {
             try {
                 FileUtils.writeStringToFile(new File(copiedFixedRepoDir + File.separator + "fixed_repo_info.txt"),
@@ -233,7 +243,7 @@ public class SoraldAdapter {
                 Constants.ARG_GIT_REPO_PATH, repoDir.getPath(),
                 Constants.ARG_PRETTY_PRINTING_STRATEGY, "SNIPER"};
 
-        File gitPatchesDir = new File(tmpdir + File.separator + "SoraldGitPatches");
+        File gitPatchesDir = new File(tmpdir + File.separator + SORALD_GIT_PATCHES_DIR);
         if (gitPatchesDir.exists()) {
             try {
                 FileUtils.deleteDirectory(gitPatchesDir);
@@ -286,10 +296,20 @@ public class SoraldAdapter {
 //        Map<String, Set<String>> lastRuleToLocations = null;
 
         ProcessBuilder processBuilder =
-                new ProcessBuilder("git", "checkout", "HEAD^")
+                new ProcessBuilder("git", "stash")
                         .directory(copyRepoDir).inheritIO();
         Process p = processBuilder.start();
         int res = p.waitFor();
+        if (res != 0) {
+            logger.error("cannot stash");
+            return new HashMap<String, Set<String>>();
+        }
+
+        processBuilder =
+                new ProcessBuilder("git", "checkout", "HEAD^")
+                        .directory(copyRepoDir).inheritIO();
+        p = processBuilder.start();
+        res = p.waitFor();
         if (res != 0) {
             logger.error("cannot checkout to head^");
             return new HashMap<String, Set<String>>();
