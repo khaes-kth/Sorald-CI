@@ -1,0 +1,92 @@
+server:
+  port: 19093
+
+spring:
+  profiles:
+    active: dev
+  application:
+    name: es-service-provider
+  cloud:
+    sentinel:
+      transport:
+        port: 8719
+        ## 默认端口8080，已改为自定义18088端口，通过http://127.0.0.1:18088/#/dashboard访问
+        dashboard: localhost:18088
+      ##使用nacos配置中心存储限流规则
+      datasource:
+        ds0:
+          nacos:
+            data-id: ${spring.application.name}-flow-rules
+            data-type: json
+            group-id: DEFAULT_GROUP
+            rule-type: flow
+            server-addr: 127.0.0.1:8848
+
+## dubbo服务注册和发现
+dubbo:
+  protocol:
+    name: dubbo
+    port: -1
+    id: dubbo
+  registry:
+    address: spring-cloud://localhost
+  scan:
+    base-packages: com.goodskill.es.service
+  cloud:
+    subscribed-services: "*"
+## 日志级别
+logging:
+  level:
+    org:
+      elasticsearch:
+        client:
+          RestClient: debug
+## es客户端配置
+elasticsearch:
+  rest:
+    client:
+      address: localhost:9200
+
+
+---
+spring:
+  profiles: dev
+dubbo:
+  registry:
+    address: spring-cloud://localhost
+elasticsearch:
+  rest:
+    client:
+      address: localhost:9200
+---
+spring:
+  profiles: docker
+  cloud:
+    nacos:
+      discovery:
+        server-addr: nacos:8848
+    sentinel:
+      datasource:
+        ds0:
+          nacos:
+            server-addr: nacos:8848
+dubbo:
+  registry:
+    address: spring-cloud://localhost
+elasticsearch:
+  rest:
+    client:
+      address: elk:9200
+---
+spring:
+  profiles: test
+  cloud:
+    nacos:
+      server-addr: 192.168.2.22:8848
+dubbo:
+  registry:
+    address: spring-cloud://192.168.2.22
+elasticsearch:
+  rest:
+    client:
+      address: 192.168.2.22:9200
