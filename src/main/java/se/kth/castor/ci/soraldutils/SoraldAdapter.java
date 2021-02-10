@@ -169,8 +169,14 @@ public class SoraldAdapter {
         }
 
         try {
-            FileUtils.copyDirectory(new File(tmpdir + File.separator + SORALD_GIT_PATCHES_DIR),
-                    new File(copiedFixedRepoDir + File.separator + SORALD_GIT_PATCHES_DIR));
+            File copiedPatchesDir = new File(copiedFixedRepoDir + File.separator + SORALD_GIT_PATCHES_DIR);
+            if(!copiedPatchesDir.exists())
+                copiedPatchesDir.mkdirs();
+
+            for(File patch : patchedFiles) {
+                FileUtils.copyFile(patch, new File(copiedPatchesDir.getPath() + File.separator + patch.getName()));
+            }
+
         } catch (IOException e) {
             logger.error("cannot copy patched repo into sorald-ci");
             return null;
