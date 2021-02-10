@@ -176,7 +176,8 @@ public class SoraldAdapter {
             return null;
         }
 
-        String newBranch = "fixed_" + commit.getRepoName() + "_" + commit.getCommitId() + "_" + rule;
+        String newBranch = "fixed_" + commit.getRepoName() + "_" + commit.getCommitId() + "_" + rule + "_"
+                + new Date().getTime();
         try {
             try {
                 FileUtils.writeStringToFile(new File(copiedFixedRepoDir + File.separator + "fixed_repo_info.txt"),
