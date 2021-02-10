@@ -1,0 +1,58 @@
+--- a/src/main/java/com/purbon/kafka/topology/api/ccloud/CCloudCLI.java
++++ b/src/main/java/com/purbon/kafka/topology/api/ccloud/CCloudCLI.java
+@@ -30,8 +30,9 @@
+       stdout = run(cmd);
+       Cluster[] items = mapper.readValue(stdout, Cluster[].class);
+       return Arrays.asList(items);
+-    } catch (IOException | InterruptedException e) {
++    } catch (java.io.IOException | java.lang.InterruptedException e) {
+       handleError(stdout, e);
++      Thread.currentThread().interrupt();
+     }
+     return null;
+   }
+@@ -44,9 +45,10 @@
+       ServiceAccount[] items = mapper.readValue(stdout, ServiceAccount[].class);
+       return Arrays.asList(items).stream()
+           .collect(Collectors.toMap(ServiceAccount::getName, i -> i));
+-    } catch (IOException | InterruptedException e) {
++    } catch (java.io.IOException | java.lang.InterruptedException e) {
+       handleError(stdout, e);
+       return null;
++      Thread.currentThread().interrupt();
+     }
+   }
+ 
+@@ -55,8 +57,9 @@
+     String stdout = "";
+     try {
+       stdout = run(cmd);
+-    } catch (IOException | InterruptedException e) {
++    } catch (java.io.IOException | java.lang.InterruptedException e) {
+       handleError(stdout, e);
++      Thread.currentThread().interrupt();
+     }
+   }
+ 
+@@ -76,8 +79,9 @@
+     try {
+       stdout = run(cmd);
+       sa = mapper.readValue(stdout, ServiceAccount.class);
+-    } catch (IOException | InterruptedException e) {
++    } catch (java.io.IOException | java.lang.InterruptedException e) {
+       handleError(stdout, e);
++      Thread.currentThread().interrupt();
+     }
+     return sa;
+   }
+@@ -87,8 +91,9 @@
+     String stdout = "";
+     try {
+       stdout = run(cmd);
+-    } catch (IOException | InterruptedException e) {
++    } catch (java.io.IOException | java.lang.InterruptedException e) {
+       handleError(stdout, e);
++      Thread.currentThread().interrupt();
+     }
+   }
+ 

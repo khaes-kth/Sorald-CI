@@ -1,0 +1,2 @@
+SelectedCommit{commitId='0e438b6b45805c28c4871d2edc79220ebb9e149c', repoName='kafka-ops/kafka-topology-builder'}
+rule: 2142
