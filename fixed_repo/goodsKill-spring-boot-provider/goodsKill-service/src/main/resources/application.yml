@@ -1,0 +1,196 @@
+server:
+  port: 19090
+
+spring:
+  profiles:
+    active: dev
+  kafka:
+    consumer:
+      group-id: seckill
+      ##ensures the new consumer group gets the messages we sent
+      auto-offset-reset: earliest
+  main:
+    allow-bean-definition-overriding: true
+  output:
+    ansi:
+      enabled: ALWAYS
+  data:
+    mongodb:
+      database: test
+  shardingsphere:
+    datasource:
+      ds0:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        password: Password123
+        type: com.zaxxer.hikari.HikariDataSource
+        jdbcUrl: jdbc:mysql://localhost:3306/seckill?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&useSSL=false
+        username: root
+      ds1:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        password: Password123
+        type: com.zaxxer.hikari.HikariDataSource
+        jdbcUrl: jdbc:mysql://localhost:3306/seckill_01?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&useSSL=false
+        username: root
+  rabbitmq:
+    port: 5672
+    username: guest
+    password: guest
+  cloud:
+    stream:
+      default-binder: rabbit
+    sentinel:
+      transport:
+        port: 8719
+        ## 默认端口8080，已改为自定义18088端口，通过http://127.0.0.1:18088/#/dashboard访问
+        dashboard: localhost:18088
+      ##使用nacos配置中心存储限流规则
+      datasource:
+        ds0:
+          nacos:
+            data-id: ${spring.application.name}-flow-rules
+            data-type: json
+            group-id: DEFAULT_GROUP
+            rule-type: flow
+            server-addr: 127.0.0.1:8848
+
+
+dubbo:
+  scan:
+    base-packages: org.seckill.service.impl
+  application:
+    id: goodskill-service-provider
+    name: goodskill-service-provider
+  protocol:
+    id: dubbo
+    name: dubbo
+    ### 服务暴露端口
+    port: -1
+    status: server
+  registry:
+    address: spring-cloud://localhost
+    provider:
+      timeout: 30000
+    id: my-registry
+  provider:
+    timeout: 30000
+  ## 此处有坑，如配置了具体的service名，对应的注入此service上的注解@Reference(check=false)会失效
+  cloud:
+    subscribed-services: "*"
+
+#Pagehelper配置
+mapper:
+  identity: MYSQL
+  not-empty: false
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+pagehelper:
+  helperDialect: mysql
+  params: count=countSql
+  reasonable: true
+  supportMethodsArguments: true
+---
+
+######################本地开发环境配置#####################
+spring:
+  profiles: dev
+  redis:
+    host: localhost
+    port: 6379
+  kafka:
+    bootstrap-servers: localhost:9092
+  shardingsphere:
+    datasource:
+      ds0:
+        password: Password123
+        jdbcUrl: jdbc:mysql://localhost:3306/seckill?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&useSSL=false
+        username: root
+      ds1:
+        password: Password123
+        jdbcUrl: jdbc:mysql://localhost:3306/seckill_01?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&useSSL=false
+        username: root
+dubbo:
+  registry:
+    address: spring-cloud://localhost
+  provider:
+    timeout: 30000
+
+zookeeper_ip: 127.0.0.1:2181
+cache_ip_address: redis://127.0.0.1:6379
+---
+######################docker环境配置#####################
+spring:
+  profiles: docker
+  redis:
+    host: redis
+    port: 6379
+  kafka:
+    bootstrap-servers: kafka:9092
+  shardingsphere:
+    datasource:
+      ds0:
+        password: Password123
+        jdbcUrl: jdbc:mysql://mysql:3306/seckill?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&useSSL=false
+        username: root
+      ds1:
+        password: Password123
+        jdbcUrl: jdbc:mysql://mysql:3306/seckill_01?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&useSSL=false
+        username: root
+  cloud:
+    nacos:
+      server-addr: nacos:8848
+    sentinel:
+      datasource:
+        ds0:
+          nacos:
+            server-addr: nacos:8848
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: guest
+    password: guest
+dubbo:
+  registry:
+    address: spring-cloud://localhost
+  provider:
+    timeout: 30000
+
+zookeeper_ip: zookeeper:2181
+cache_ip_address: redis://redis:6379
+
+---
+spring:
+  profiles: test
+  redis:
+    host: 192.168.2.22
+    port: 6379
+  kafka:
+    bootstrap-servers: 192.168.2.22:9092
+  rabbitmq:
+    host: 192.168.2.22
+  shardingsphere:
+    datasource:
+      ds0:
+        password: Password123
+        jdbcUrl: jdbc:mysql://192.168.2.22:3306/seckill?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&useSSL=false
+        username: root
+      ds1:
+        password: Password123
+        jdbcUrl: jdbc:mysql://192.168.2.22:3306/seckill_01?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&useSSL=false
+        username: root
+  cloud:
+    nacos:
+      server-addr: 192.168.2.22:8848
+    sentinel:
+      ##使用nacos配置中心存储限流规则
+      datasource:
+        ds0:
+          nacos:
+            server-addr: 192.168.2.22:8848
+dubbo:
+  registry:
+    address: spring-cloud://192.168.2.22
+  provider:
+    timeout: 30000
+
+zookeeper_ip: 192.168.2.22:2181
+cache_ip_address: redis://192.168.2.22:6379

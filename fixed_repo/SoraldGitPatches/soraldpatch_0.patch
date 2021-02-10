@@ -1,0 +1,20 @@
+--- a/goodsKill-common/src/main/java/com/goodskill/common/JwtUtils.java
++++ b/goodsKill-common/src/main/java/com/goodskill/common/JwtUtils.java
+@@ -1,4 +1,8 @@
+ package com.goodskill.common;
++import MalformedJwtException;
++import ExpiredJwtException;
++import Jwts;
++import UnsupportedJwtException;
+ 
+ import io.jsonwebtoken.*;
+ import io.jsonwebtoken.security.SignatureException;
+@@ -24,7 +28,7 @@
+     /**
+      * 过期时间（毫秒单位）
+      */
+-    private final static long TOKEN_EXPIRE_MILLIS = 1000 * 60 * 60 * 24;
++    private final static long TOKEN_EXPIRE_MILLIS = ((1000l * 60) * 60) * 24;
+ 
+     /**
+      * 创建token
