@@ -1,0 +1,11 @@
+--- a/core/src/main/java/com/taobao/arthas/core/shell/term/impl/http/DirectoryBrowser.java
++++ b/core/src/main/java/com/taobao/arthas/core/shell/term/impl/http/DirectoryBrowser.java
+@@ -47,7 +47,7 @@
+ 
+     public static final String HTTP_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss zzz";
+     public static final String HTTP_DATE_GMT_TIMEZONE = "GMT";
+-    public static final long MIN_NETTY_DIRECT_SEND_SIZE = 10 * 1024 * 1024;
++    public static final long MIN_NETTY_DIRECT_SEND_SIZE = (10l * 1024) * 1024;
+     private static final Logger logger = LoggerFactory.getLogger(DirectoryBrowser.class);
+     //@formatter:off
+     private static String pageHeader = "<!DOCTYPE html>\n" + 

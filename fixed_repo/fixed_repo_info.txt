@@ -1,0 +1,2 @@
+SelectedCommit{commitId='285b73d624180763a91fc8abb694c0a39d55004b', repoName='alibaba/arthas'}
+rule: 2184
