@@ -1,0 +1,84 @@
+--- a/src/main/java/com/purbon/kafka/topology/backend/FileBackend.java
++++ b/src/main/java/com/purbon/kafka/topology/backend/FileBackend.java
+@@ -1,4 +1,5 @@
+ package com.purbon.kafka.topology.backend;
++import java.io.File;
+ 
+ import com.purbon.kafka.topology.BackendController.Mode;
+ import com.purbon.kafka.topology.model.cluster.ServiceAccount;
+@@ -67,23 +68,24 @@
+   public Set<TopologyAclBinding> load(URI uri) throws IOException {
+     Path filePath = Paths.get(uri);
+     Set<TopologyAclBinding> bindings = new LinkedHashSet<>();
+-    BufferedReader in = new BufferedReader(new FileReader(filePath.toFile()));
+-    String type = in.readLine();
+-    String line = null;
+-    while ((line = in.readLine()) != null) {
+-      TopologyAclBinding binding = null;
+-      if (line.equalsIgnoreCase("ServiceAccounts")) {
+-        // process service accounts, should break from here.
+-        break;
+-      }
+-      if (type.equalsIgnoreCase("acls")) {
+-        binding = buildAclBinding(line);
+-      } else {
+-        throw new IOException("Binding type ( " + type + " )not supported.");
+-      }
+-      bindings.add(binding);
++    try (BufferedReader in = new BufferedReader(new FileReader(filePath.toFile()))) {
++      String type = in.readLine();
++      String line = null;
++      while ((line = in.readLine()) != null) {
++        TopologyAclBinding binding = null;
++        if (line.equalsIgnoreCase("ServiceAccounts")) {
++          // process service accounts, should break from here.
++          break;
++        }
++        if (type.equalsIgnoreCase("acls")) {
++          binding = buildAclBinding(line);
++        } else {
++          throw new IOException(("Binding type ( " + type) + " )not supported.");
++        }
++        bindings.add(binding);
++      } 
++      return bindings;
+     }
+-    return bindings;
+   }
+ 
+   public Set<ServiceAccount> loadServiceAccounts() throws IOException {
+@@ -92,21 +94,22 @@
+     }
+     Path filePath = Paths.get(STATE_FILE_NAME);
+     Set<ServiceAccount> accounts = new HashSet<>();
+-    BufferedReader in = new BufferedReader(new FileReader(filePath.toFile()));
+-    String line = null;
+-    while ((line = in.readLine()) != null) {
+-      if (line.equalsIgnoreCase("ServiceAccounts")) {
+-        // process service accounts, should break from here.
+-        break;
+-      }
+-    }
+-    if (line != null && line.equalsIgnoreCase("ServiceAccounts")) {
++    try (BufferedReader in = new BufferedReader(new FileReader(filePath.toFile()))) {
++      String line = null;
+       while ((line = in.readLine()) != null) {
+-        ServiceAccount account = (ServiceAccount) JSON.toObject(line, ServiceAccount.class);
+-        accounts.add(account);
++        if (line.equalsIgnoreCase("ServiceAccounts")) {
++          // process service accounts, should break from here.
++          break;
++        }
++      } 
++      if ((line != null) && line.equalsIgnoreCase("ServiceAccounts")) {
++        while ((line = in.readLine()) != null) {
++          ServiceAccount account = ((ServiceAccount) (JSON.toObject(line, ServiceAccount.class)));
++          accounts.add(account);
++        } 
+       }
++      return accounts;
+     }
+-    return accounts;
+   }
+ 
+   private TopologyAclBinding buildRBACBinding(String line) {
