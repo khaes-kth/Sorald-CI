@@ -1,0 +1,10 @@
+--- a/MyPerf4J-Base/src/main/java/cn/myperf4j/base/util/concurrent/MyAtomicIntArray.java
++++ b/MyPerf4J-Base/src/main/java/cn/myperf4j/base/util/concurrent/MyAtomicIntArray.java
+@@ -139,6 +139,6 @@
+ 
+     public void reset() {
+         final int[] array = this.array;
+-        unsafe.setMemory(array, byteOffset(0), array.length * scale, (byte) 0);
++        unsafe.setMemory(array, byteOffset(0), (long) array.length * scale, ((byte) (0)));
+     }
+ }
