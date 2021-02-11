@@ -1,0 +1,2 @@
+SelectedCommit{commitId='97c894a8688775cb283bbb324f3e276bced0250d', repoName='DanielYWoo/fast-object-pool'}
+rule: 2142
