@@ -1,0 +1,2 @@
+SelectedCommit{commitId='000a99c53efd827a83c0e91ed9eb637d4fc049dc', repoName='Athou/commafeed'}
+rule: 2142
