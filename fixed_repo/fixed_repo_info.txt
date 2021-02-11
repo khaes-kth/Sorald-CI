@@ -1,0 +1,2 @@
+SelectedCommit{commitId='ef32e8d77f865c2a14fe1ae23cdbb8a3ecf4ec8f', repoName='LianjiaTech/retrofit-spring-boot-starter'}
+rule: 2095
