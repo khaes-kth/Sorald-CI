@@ -1,0 +1,11 @@
+--- a/src/main/java/cn/nukkit/metrics/Metrics.java
++++ b/src/main/java/cn/nukkit/metrics/Metrics.java
+@@ -81,7 +81,7 @@
+         long initialDelay = (long) (1000 * 60 * (3 + Math.random() * 3));
+         long secondDelay = (long) (1000 * 60 * (Math.random() * 30));
+         scheduler.schedule(submitTask, initialDelay, TimeUnit.MILLISECONDS);
+-        scheduler.scheduleAtFixedRate(submitTask, initialDelay + secondDelay, 1000 * 60 * 30, TimeUnit.MILLISECONDS);
++        scheduler.scheduleAtFixedRate(submitTask, initialDelay + secondDelay, (1000l * 60) * 30, TimeUnit.MILLISECONDS);
+     }
+ 
+     /**
