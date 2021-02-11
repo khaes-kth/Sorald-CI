@@ -1,0 +1,19 @@
+created:
+https://github.com/AddstarMC/Prism-Bukkit/pull/247
+https://github.com/AddstarMC/Prism-Bukkit/pull/248
+https://github.com/kafka-ops/kafka-topology-builder/pull/206
+https://github.com/LinShunKang/MyPerf4J/pull/70
+https://github.com/kafka-ops/kafka-topology-builder/pull/207
+https://github.com/techa03/goodsKill/pull/79
+https://github.com/DanielYWoo/fast-object-pool/pull/26
+https://github.com/Athou/commafeed/pull/957
+
+not_created:
+https://github.com/khaes-kth/arthas/tree/fixed/Sonar_2095 => does not compile (source-level should go higher)
+https://github.com/khaes-kth/Sorald-CI/blob/fixed_LianjiaTech/retrofit-spring-boot-starter_a6cfd41658170f108be0391fd26c353650d90d75_2095_1613019018315/fixed_repo/SoraldGitPatches/soraldpatch_0.patch => wrong detection
+
+waiting for full results for rule 2184:
+https://github.com/khaes-kth/Sorald-CI/tree/fixed_alibaba/arthas_285b73d624180763a91fc8abb694c0a39d55004b_2184_1612994989169
+https://github.com/khaes-kth/Sorald-CI/tree/fixed_LinShunKang/MyPerf4J_4fe88124665eea3d356ead6c56e36b348871568f_2184_1612996848667
+https://github.com/khaes-kth/Sorald-CI/tree/fixed_techa03/goodsKill_b6b0621c3ab1f987f755a44d181bba6ec28507bb_2184_1612999379386
+https://github.com/khaes-kth/Sorald-CI/tree/fixed_CloudburstMC/Nukkit_12b389a263a0425e057f283d3698d81ff258c69b_2184_1613008119984
