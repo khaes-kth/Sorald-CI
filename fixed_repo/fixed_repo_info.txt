@@ -1,0 +1,2 @@
+SelectedCommit{commitId='b42fe921a43e3d1391c00a0a6bb0e49addc16314', repoName='SpoonLabs/sorald'}
+rule: 2184
