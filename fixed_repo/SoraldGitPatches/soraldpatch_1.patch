@@ -1,0 +1,86 @@
+--- a/src/test/resources/processor_test_files/2095_UnclosedResources/NOCOMPILE_ZipFolder.java
++++ b/src/test/resources/processor_test_files/2095_UnclosedResources/NOCOMPILE_ZipFolder.java
+@@ -55,29 +55,22 @@
+         // Indexing content
+         if (files == null) {
+             files = new ArrayList<>();
+-            ZipInputStream zipInput = null;
+-            try {
+-                zipInput = new ZipInputStream(new BufferedInputStream(new FileInputStream(file)));// Noncompliant
+-
++            try (ZipInputStream zipInput = new ZipInputStream(new BufferedInputStream(new FileInputStream(file)))) {
+                 ZipEntry entry;
+                 while ((entry = zipInput.getNextEntry()) != null) {
+                     // deflate in buffer
+                     final int buffer = 2048;
+-                    ByteArrayOutputStream output = new ByteArrayOutputStream(
+-                            buffer);
++                    ByteArrayOutputStream output = new ByteArrayOutputStream(buffer);
+                     int count;
+-                    byte data[] = new byte[buffer];
+-                    while ((count = zipInput.read(data, 0, buffer)) != -1) {
++                    byte[] data = new byte[buffer];
++                    while ((count = zipInput.read(data, 0, buffer)) != (-1)) {
+                         output.write(data, 0, count);
+-                    }
++                    } 
+                     output.flush();
+                     output.close();
+-
+-                    files.add(new ZipFile(this, entry.getName(), output
+-                            .toByteArray()));
+-                }
++                    files.add(new ZipFile(this, entry.getName(), output.toByteArray()));
++                } 
+                 zipInput.close();
+-
+             } catch (Exception e) {
+                 Launcher.LOGGER.error(e.getMessage(), e);
+             }
+@@ -157,14 +150,12 @@
+ 
+     /** physically extracts on disk all files of this zip file in the destinationDir `destDir` */
+     public void extract(File destDir) {
+-        ZipInputStream zipInput = null;
+-        try {
+-            zipInput = new ZipInputStream(new BufferedInputStream(new FileInputStream(file)));// Noncompliant
+-
++        try (ZipInputStream zipInput = new ZipInputStream(new BufferedInputStream(new FileInputStream(file)))) {
+             ZipEntry entry;
+             while ((entry = zipInput.getNextEntry()) != null) {
+-                File f = new File(destDir + File.separator + entry.getName());
+-                if (entry.isDirectory()) { // if its a directory, create it
++                File f = new File((destDir + File.separator) + entry.getName());
++                if (entry.isDirectory()) {
++                    // if its a directory, create it
+                     f.mkdir();
+                     continue;
+                 }
+@@ -172,16 +163,18 @@
+                 final int buffer = 2048;
+                 // Force parent directory creation, sometimes directory was not yet handled
+                 f.getParentFile().mkdirs();
+-                // in the zip entry iteration
+-                OutputStream output = new BufferedOutputStream(new FileOutputStream(f));// Noncompliant
+-                int count;
+-                byte data[] = new byte[buffer];
+-                while ((count = zipInput.read(data, 0, buffer)) != -1) {
+-                    output.write(data, 0, count);
++                try (// in the zip entry iteration
++                OutputStream output = new BufferedOutputStream(new FileOutputStream(f))// Noncompliant
++                ) {
++                    int count;
++                    byte[] data = new byte[buffer];
++                    while ((count = zipInput.read(data, 0, buffer)) != (-1)) {
++                        output.write(data, 0, count);
++                    } 
++                    output.flush();
++                    output.close();
+                 }
+-                output.flush();
+-                output.close();
+-            }
++            } 
+             zipInput.close();
+         } catch (Exception e) {
+             Launcher.LOGGER.error(e.getMessage(), e);
