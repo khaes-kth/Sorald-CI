@@ -1,0 +1,11 @@
+--- a/src/test/resources/processor_test_files/1217_ThreadRun/ThreadRunInvocation.java
++++ b/src/test/resources/processor_test_files/1217_ThreadRun/ThreadRunInvocation.java
+@@ -3,7 +3,7 @@
+     Runnable runnable = null;
+ 
+     Thread myThread = new Thread(runnable);
+-    myThread.run(); // Noncompliant
++    myThread.start();
+ 
+     Thread myThread2 = new Thread(runnable);
+     myThread2.start();
