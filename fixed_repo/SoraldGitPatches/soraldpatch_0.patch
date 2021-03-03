@@ -1,0 +1,11 @@
+--- a/src/test/resources/processor_test_files/2225_ToStringReturningNull/NullReturningToString.java
++++ b/src/test/resources/processor_test_files/2225_ToStringReturningNull/NullReturningToString.java
+@@ -7,7 +7,7 @@
+     public String toString() {
+         Random r = new Random();
+         if(r.nextInt(10) == r.nextInt(10)){
+-            return null; // Noncompliant
++            return ""; // Noncompliant
+         }
+         else if(r.nextInt(10) == r.nextInt(10)){
+             return "null";
