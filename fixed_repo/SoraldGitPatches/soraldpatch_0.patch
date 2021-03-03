@@ -1,0 +1,16 @@
+--- a/src/test/resources/processor_test_files/2184_CastArithmeticOperand/VariableIntOperand.java
++++ b/src/test/resources/processor_test_files/2184_CastArithmeticOperand/VariableIntOperand.java
+@@ -2,9 +2,9 @@
+     public static void method() {
+         int a = 22;
+         int b = 33;
+-        long longVal = a + b; // Noncompliant
+-        float floatVal = a + b; // Noncompliant
+-        double doubleVal = a + b; // Noncompliant
+-        double doubleDiv = a / b; // Noncompliant
++        long longVal = (long) a + b; // Noncompliant
++        float floatVal = (float) a + b; // Noncompliant
++        double doubleVal = (double) a + b; // Noncompliant
++        double doubleDiv = (double) a / b; // Noncompliant
+     }
+ }
