@@ -1,0 +1,24 @@
+--- a/src/test/resources/processor_test_files/2142_InterruptedException/CatchesWithNestedExits.java
++++ b/src/test/resources/processor_test_files/2142_InterruptedException/CatchesWithNestedExits.java
+@@ -1,3 +1,4 @@
++
+ /*
+ This file contains catches of InterruptedException with nested exits (throws and return statements).
+ The point here is to verify that the interrupt is added before the method is exited.
+@@ -19,6 +20,7 @@
+                 return;
+             }
+             System.out.println("End of catch");
++            Thread.currentThread().interrupt();
+         }
+     }
+ 
+@@ -31,6 +33,7 @@
+                 throw new RuntimeException();
+             }
+             System.out.println("End of catch");
++            Thread.currentThread().interrupt();
+         }
+     }
+ }
+\ No newline at end of file
