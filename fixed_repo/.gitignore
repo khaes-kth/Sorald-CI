@@ -1,0 +1,16 @@
+.classpath
+.project
+.settings/
+target/
+source/
+spooned/
+*.class
+*.logs
+*.iml
+.idea/
+.eclipse
+SampleProcessor.java
+script.sh
+sorald-workspace/
+FileOutputStrategyTest/
+sonar-java/

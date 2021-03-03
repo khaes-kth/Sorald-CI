@@ -1,0 +1,9 @@
+--- a/src/test/resources/processor_test_files/2184_CastArithmeticOperand/MultipleBinaryOperatorsInMethodCall.java
++++ b/src/test/resources/processor_test_files/2184_CastArithmeticOperand/MultipleBinaryOperatorsInMethodCall.java
+@@ -7,5 +7,5 @@
+ 
+ class MultipleBinaryOperatorsInMethodCall {
+     int seconds = 1000;
+-    Date myDate = new Date(seconds * 1000 * 10); // Noncompliant
++    Date myDate = new Date((seconds * 1000l)  * 10); // Noncompliant
+ }
