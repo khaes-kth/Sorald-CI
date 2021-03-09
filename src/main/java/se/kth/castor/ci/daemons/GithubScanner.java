@@ -28,6 +28,7 @@ public class GithubScanner extends Thread {
     private String tmpdir;
     private String patchPrintingMode;
     private long frequency;
+    private long startTime;
 
     public GithubScanner
             (
@@ -37,7 +38,8 @@ public class GithubScanner extends Thread {
                     List<String> rules,
                     String tmpdir,
                     String patchPrintingMode,
-                    Long frequency
+                    Long frequency,
+                    Long startTime
             ) {
         this.fetchMode = fetchMode;
         this.repos = repos;
@@ -47,12 +49,13 @@ public class GithubScanner extends Thread {
         this.patchPrintingMode = patchPrintingMode;
         this.lastFetched = new Date().getTime();
         this.frequency = frequency == null ? DEFAULT_FREQUENCY : frequency;
+        this.startTime = startTime == null ? new Date().getTime() : startTime;
     }
 
     @Override
     public void run() {
         while (true) {
-            long now = new Date().getTime();
+            long now = startTime;
 
             try {
                 List<SelectedCommit> selectedCommits = fetch(

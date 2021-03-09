@@ -42,6 +42,9 @@ public class Application implements ApplicationRunner {
     @Value("${commit.fetch.frequency}")
     private Long commitFetchFrequency;
 
+    @Value("${commit.fetch.start.time}")
+    private Long commitFetchStartTime;
+
     private File dataFile;
 
     private GithubScanner githubScanner;
