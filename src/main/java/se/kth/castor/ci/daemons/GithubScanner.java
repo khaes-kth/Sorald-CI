@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.kth.castor.ci.githubapi.commits.GithubAPICommitAdapter;
 import se.kth.castor.ci.githubapi.commits.models.SelectedCommit;
-import se.kth.castor.ci.soraldutils.SoraldAdapter;
+import se.kth.castor.ci.soraldutils.SoraldCIAdapter;
 
 import java.io.File;
 import java.io.IOException;
@@ -85,7 +85,7 @@ public class GithubScanner extends Thread {
     }
 
     private void process(SelectedCommit commit) throws IOException, GitAPIException, ParseException, InterruptedException {
-        List<String> fixedCommitUrl = SoraldAdapter.getInstance(tmpdir, patchPrintingMode).repairAndCreateForks(commit, rules);
+        List<String> fixedCommitUrl = SoraldCIAdapter.getInstance(tmpdir, patchPrintingMode).repairAndCreateForks(commit, rules);
 
         logger.info("repaired: " + commit.getCommitUrl());
         FileUtils.writeStringToFile(dataFile, new Date() + "," + commit.getCommitUrl() + ","
