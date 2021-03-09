@@ -103,7 +103,7 @@ public class SoraldCIAdapter {
                 Constants.ARG_RULE_KEYS, rule,
                 Constants.ARG_WORKSPACE, tmpdir,
                 Constants.ARG_GIT_REPO_PATH, repoDir.getPath(),
-                Constants.ARG_PRETTY_PRINTING_STRATEGY, "SNIPER"};
+                Constants.ARG_PRETTY_PRINTING_STRATEGY, patchPrintingMode};
 
         File gitPatchesDir = new File(tmpdir + File.separator + SORALD_GIT_PATCHES_DIR);
         if (gitPatchesDir.exists()) {

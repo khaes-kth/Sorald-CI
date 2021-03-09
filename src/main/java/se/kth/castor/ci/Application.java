@@ -36,7 +36,7 @@ public class Application implements ApplicationRunner {
     @Value("${repos.path}")
     private String reposLstPath;
 
-    @Value("${repos.path}")
+    @Value("${patch.printing.mode}")
     private String patchPrintingMode;
 
     private File dataFile;
@@ -53,7 +53,7 @@ public class Application implements ApplicationRunner {
                 new HashSet<String>(FileUtils.readLines(new File(reposLstPath),
                 "UTF-8"));
         githubScanner = new GithubScanner(GithubScanner.FetchMode.ALL, repos, dataFile,
-                Arrays.asList(rulesStr.split(",")), tmpdir);
+                Arrays.asList(rulesStr.split(",")), tmpdir, patchPrintingMode);
         githubScanner.setDaemon(true);
         githubScanner.start();
     }
