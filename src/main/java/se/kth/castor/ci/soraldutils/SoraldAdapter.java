@@ -30,24 +30,32 @@ public class SoraldAdapter {
     private static final String SORALD_GIT_PATCHES_DIR = "SoraldGitPatches";
     private static final String SORALD_CI_REPO = "Sorald-CI";
     private static final String SORALD_URL = "git@github.com:khaes-kth/Sorald-CI.git";
+    private static final String SPOON_SNIPER_MODE = "SNIPER";
 
     private static final Logger logger = LoggerFactory.getLogger(SoraldAdapter.class);
     private static SoraldAdapter _instance;
 
+    private String patchPrintingMode = SPOON_SNIPER_MODE;
     private String tmpdir;
 
     public SoraldAdapter(String tmpdir) {
         this.tmpdir = tmpdir;
     }
 
-    public static SoraldAdapter getInstance(String tmpdir) {
+    public SoraldAdapter(String tmpdir, String patchPrintingMode) {
+        this.tmpdir = tmpdir;
+        this.patchPrintingMode = patchPrintingMode;
+    }
+
+    public static SoraldAdapter getInstance(String tmpdir, String patchPrintingMode) {
         if (_instance == null)
-            _instance = new SoraldAdapter(tmpdir);
+            _instance = patchPrintingMode == null ? new SoraldAdapter(tmpdir)
+                    : new SoraldAdapter(tmpdir, patchPrintingMode);
         return _instance;
     }
 
     // returns list of fixed-commit generated urls
-    public List<String> repair(SelectedCommit commit, List<String> rules)
+    public List<String> repairAndCreateForks(SelectedCommit commit, List<String> rules)
             throws ParseException, GitAPIException, IOException, InterruptedException {
         logger.info("repairing: " + commit.getCommitUrl());
 

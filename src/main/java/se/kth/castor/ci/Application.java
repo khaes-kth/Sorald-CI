@@ -43,6 +43,9 @@ public class Application implements ApplicationRunner {
     @Value("${repos.path}")
     private String reposLstPath;
 
+    @Value("${repos.path}")
+    private String patchPrintingMode;
+
     private File dataFile;
 
     private GithubScanner githubScanner;

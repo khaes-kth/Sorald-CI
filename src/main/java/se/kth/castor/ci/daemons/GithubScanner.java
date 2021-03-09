@@ -26,6 +26,7 @@ public class GithubScanner extends Thread {
     private File dataFile;
     private List<String> rules;
     private String tmpdir;
+    private String patchPrintingMode;
 
     public GithubScanner
             (
@@ -33,13 +34,15 @@ public class GithubScanner extends Thread {
                     Set<String> repos,
                     File dataFile,
                     List<String> rules,
-                    String tmpdir
+                    String tmpdir,
+                    String patchPrintingMode
             ) {
         this.fetchMode = fetchMode;
         this.repos = repos;
         this.dataFile = dataFile;
         this.rules = rules;
         this.tmpdir = tmpdir;
+        this.patchPrintingMode = patchPrintingMode;
         this.lastFetched = new Date().getTime();
     }
 
@@ -82,11 +85,19 @@ public class GithubScanner extends Thread {
     }
 
     private void process(SelectedCommit commit) throws IOException, GitAPIException, ParseException, InterruptedException {
-        List<String> fixedCommitUrl = SoraldAdapter.getInstance(tmpdir).repair(commit, rules);
+        List<String> fixedCommitUrl = SoraldAdapter.getInstance(tmpdir, patchPrintingMode).repairAndCreateForks(commit, rules);
 
         logger.info("repaired: " + commit.getCommitUrl());
         FileUtils.writeStringToFile(dataFile, new Date() + "," + commit.getCommitUrl() + ","
                         + fixedCommitUrl + System.lineSeparator(), "UTF-8", true);
+    }
+
+    public String getPatchPrintingMode() {
+        return patchPrintingMode;
+    }
+
+    public void setPatchPrintingMode(String patchPrintingMode) {
+        this.patchPrintingMode = patchPrintingMode;
     }
 
     public enum FetchMode {
