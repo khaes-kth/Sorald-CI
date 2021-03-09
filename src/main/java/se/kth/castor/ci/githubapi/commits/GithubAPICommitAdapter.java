@@ -26,22 +26,25 @@ public class GithubAPICommitAdapter {
                     GHRepository repo,
                     long since,
                     long until,
-                    GithubScanner.FetchMode fetchMode
+                    GithubScanner.FetchMode fetchMode,
+                    boolean checkGithubActionsFailures
             ) throws IOException {
         List<SelectedCommit> res = new ArrayList<>();
 
         GHCommitQueryBuilder query = repo.queryCommits().since(since).until(until);
         for (GHCommit commit : query.list().toList()) {
             boolean isGithubActionsFailed = false;
-            for (GHCheckRun check : commit.getCheckRuns()) {
-                if (check.getApp().getName().equals("GitHub Actions") && !isGithubActionsFailed) {
-                    if (check.getConclusion() != null && (!check.getConclusion().equals("success")
-                            && !check.getConclusion().equals("neutral") && !check.getConclusion().equals("skipped"))) {
-                        isGithubActionsFailed = true;
+            if(checkGithubActionsFailures) {
+                for (GHCheckRun check : commit.getCheckRuns()) {
+                    if (check.getApp().getName().equals("GitHub Actions") && !isGithubActionsFailed) {
+                        if (check.getConclusion() != null && (!check.getConclusion().equals("success")
+                                && !check.getConclusion().equals("neutral") && !check.getConclusion().equals("skipped"))) {
+                            isGithubActionsFailed = true;
+                        }
                     }
+                    if (isGithubActionsFailed)
+                        break;
                 }
-                if (isGithubActionsFailed)
-                    break;
             }
 
             switch(fetchMode) {
@@ -64,7 +67,8 @@ public class GithubAPICommitAdapter {
                     long intervalStart,
                     long intervalEnd,
                     GithubScanner.FetchMode fetchMode,
-                    Set<String> repos
+                    Set<String> repos,
+                    boolean checkGithubActionsFailures
             ) throws IOException {
          repos = repos == null ? GithubAPIRepoAdapter.getInstance()
                 .listJavaRepositories(intervalStart, 0, GithubAPIRepoAdapter.MAX_STARS) : repos;
@@ -89,7 +93,7 @@ public class GithubAPICommitAdapter {
                 }
 
                 selectedCommits.addAll(GithubAPICommitAdapter.getInstance()
-                        .getSelectedCommits(repo, intervalStart, intervalEnd, fetchMode));
+                        .getSelectedCommits(repo, intervalStart, intervalEnd, fetchMode, checkGithubActionsFailures));
 
             } catch (Exception e) {
                 System.err.println("error occurred for: " + repoName);

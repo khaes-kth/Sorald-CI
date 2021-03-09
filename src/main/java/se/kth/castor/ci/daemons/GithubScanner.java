@@ -81,7 +81,7 @@ public class GithubScanner extends Thread {
 
     private List<SelectedCommit> fetch(long startTime, long endTime) throws Exception {
         return GithubAPICommitAdapter.getInstance()
-                .getSelectedCommits(startTime, endTime, fetchMode, repos);
+                .getSelectedCommits(startTime, endTime, fetchMode, repos, false);
     }
 
     private void process(SelectedCommit commit) throws IOException, GitAPIException, ParseException, InterruptedException {
