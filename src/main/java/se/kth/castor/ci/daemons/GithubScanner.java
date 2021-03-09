@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 public class GithubScanner extends Thread {
     private static final Logger logger = LoggerFactory.getLogger(GithubScanner.class);
-    private static final long FREQUENCY = 1 * 60 * 60 * 1000L;
+    private static final long DEFAULT_FREQUENCY = 1 * 60 * 60 * 1000L;
 
     private FetchMode fetchMode;
     private Set<String> repos;
@@ -27,6 +27,7 @@ public class GithubScanner extends Thread {
     private List<String> rules;
     private String tmpdir;
     private String patchPrintingMode;
+    private long frequency;
 
     public GithubScanner
             (
@@ -35,7 +36,8 @@ public class GithubScanner extends Thread {
                     File dataFile,
                     List<String> rules,
                     String tmpdir,
-                    String patchPrintingMode
+                    String patchPrintingMode,
+                    Long frequency
             ) {
         this.fetchMode = fetchMode;
         this.repos = repos;
@@ -44,6 +46,7 @@ public class GithubScanner extends Thread {
         this.tmpdir = tmpdir;
         this.patchPrintingMode = patchPrintingMode;
         this.lastFetched = new Date().getTime();
+        this.frequency = frequency == null ? DEFAULT_FREQUENCY : frequency;
     }
 
     @Override
@@ -72,7 +75,7 @@ public class GithubScanner extends Thread {
             lastFetched = now;
 
             try {
-                TimeUnit.MILLISECONDS.sleep(FREQUENCY);
+                TimeUnit.MILLISECONDS.sleep(frequency);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

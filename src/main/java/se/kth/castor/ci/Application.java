@@ -39,6 +39,9 @@ public class Application implements ApplicationRunner {
     @Value("${patch.printing.mode}")
     private String patchPrintingMode;
 
+    @Value("${commit.fetch.frequency}")
+    private Long commitFetchFrequency;
+
     private File dataFile;
 
     private GithubScanner githubScanner;
