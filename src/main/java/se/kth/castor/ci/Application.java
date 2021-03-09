@@ -72,21 +72,3 @@ public class Application implements ApplicationRunner {
         runDaemons();
     }
 }
-
-@RestController
-class Controller {
-    @Value("${data.filepath}")
-    private String dataFilePath;
-
-    @RequestMapping("/stats")
-    public ResponseEntity<String> fixCommits() throws IOException {
-        File dataFile = new File(dataFilePath);
-
-        if(!dataFile.exists()){
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(FileUtils.readFileToString(dataFile, "UTF-8"));
-    }
-}
-
