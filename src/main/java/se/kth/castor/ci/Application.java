@@ -59,7 +59,8 @@ public class Application implements ApplicationRunner {
                 new HashSet<String>(FileUtils.readLines(new File(reposLstPath),
                 "UTF-8"));
         githubScanner = new GithubScanner(GithubScanner.FetchMode.ALL, repos, dataFile,
-                Arrays.asList(rulesStr.split(",")), tmpdir, patchPrintingMode);
+                Arrays.asList(rulesStr.split(",")), tmpdir, patchPrintingMode,
+                commitFetchFrequency, commitFetchStartTime);
         githubScanner.setDaemon(true);
         githubScanner.start();
     }
