@@ -98,14 +98,6 @@ public class GithubScanner extends Thread {
                         + fixedCommitUrl + System.lineSeparator(), "UTF-8", true);
     }
 
-    public String getPatchPrintingMode() {
-        return patchPrintingMode;
-    }
-
-    public void setPatchPrintingMode(String patchPrintingMode) {
-        this.patchPrintingMode = patchPrintingMode;
-    }
-
     public enum FetchMode {
         FAILED, ALL;
     }
