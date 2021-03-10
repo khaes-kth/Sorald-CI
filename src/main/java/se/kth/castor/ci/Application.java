@@ -3,11 +3,13 @@ package se.kth.castor.ci;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import se.kth.castor.ci.daemons.GithubScanner;
@@ -17,6 +19,7 @@ import se.kth.castor.ci.githubapi.repositories.GithubAPIRepoAdapter;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
 
 @Configuration
@@ -26,8 +29,11 @@ public class Application implements ApplicationRunner {
     private static final String FETCH_COMMITS_MODE = "fetch-commits";
     private static final Logger logger = LoggerFactory.getLogger(Application.class);
 
-    @Value("${data.filepath:#{null}}")
-    private String dataFilePath;
+    @Autowired
+    private ApplicationContext context;
+
+    @Value("${output.filepath:#{null}}")
+    private String outputFilePath;
 
     @Value("${rules:#{null}}")
     private String rulesStr;
@@ -108,9 +114,14 @@ public class Application implements ApplicationRunner {
                                     false
                             );
 
-            commits.stream().forEach(System.out::println);
+            PrintWriter pw = new PrintWriter(new File(outputFilePath));
+            commits.stream().forEach(pw::println);
+            pw.flush();
+            pw.close();
+
+            SpringApplication.exit(context);
         } else {
-            dataFile = new File(dataFilePath);
+            dataFile = new File(outputFilePath);
 
             if (!dataFile.exists())
                 dataFile.createNewFile();

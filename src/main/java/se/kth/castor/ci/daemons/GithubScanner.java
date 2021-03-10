@@ -24,7 +24,7 @@ public class GithubScanner extends Thread {
     private FetchMode fetchMode;
     private Set<String> repos;
     private long lastFetched = -1L;
-    private File dataFile;
+    private File outputFile;
     private List<String> rules;
     private String tmpdir;
     private String patchPrintingMode;
@@ -36,7 +36,7 @@ public class GithubScanner extends Thread {
             (
                     FetchMode fetchMode,
                     Set<String> repos,
-                    File dataFile,
+                    File outputFile,
                     List<String> rules,
                     String tmpdir,
                     String patchPrintingMode,
@@ -46,7 +46,7 @@ public class GithubScanner extends Thread {
             ) {
         this.fetchMode = fetchMode;
         this.repos = repos;
-        this.dataFile = dataFile;
+        this.outputFile = outputFile;
         this.rules = rules;
         this.tmpdir = tmpdir;
         this.patchPrintingMode = patchPrintingMode;
@@ -101,7 +101,7 @@ public class GithubScanner extends Thread {
         List<String> fixedCommitUrl = SoraldCIAdapter.getInstance(tmpdir, patchPrintingMode).repairAndCreateForks(commit, rules);
 
         logger.info("repaired: " + commit.getCommitUrl());
-        FileUtils.writeStringToFile(dataFile, new Date() + "," + commit.getCommitUrl() + ","
+        FileUtils.writeStringToFile(outputFile, new Date() + "," + commit.getCommitUrl() + ","
                         + fixedCommitUrl + System.lineSeparator(), "UTF-8", true);
     }
 
