@@ -25,6 +25,11 @@ public class GithubAPIRepoAdapter {
     private Set<String> listJavaRepositories(String pushedAfter, int min, int max) throws IOException {
         Set<String> res = new HashSet<>();
 
+        min = Math.max(min, 0);
+        min = Math.min(min, MAX_STARS);
+        max = Math.max(max, min);
+        max = Math.min(max, MAX_STARS);
+
         GHRepositorySearchBuilder searchQuery = GAA.g().searchRepositories().language("java")
                 .pushed(">" + pushedAfter).stars(min + ".." + max);
 
