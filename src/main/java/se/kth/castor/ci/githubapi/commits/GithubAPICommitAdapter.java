@@ -21,7 +21,7 @@ public class GithubAPICommitAdapter {
         return _instance;
     }
 
-    public List<SelectedCommit> getSelectedCommits
+    private List<SelectedCommit> getSelectedCommits
             (
                     GHRepository repo,
                     long since,
