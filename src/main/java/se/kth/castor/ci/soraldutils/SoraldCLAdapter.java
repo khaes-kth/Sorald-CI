@@ -134,7 +134,7 @@ public class SoraldCLAdapter {
      * @param repoDir .
      * @return A map from ruleNumber to the set of corresponding violation locations.
      */
-    private Map<String, Set<String>> listViolationLocations(File repoDir) throws IOException, ParseException {
+    public Map<String, Set<String>> listViolationLocations(File repoDir) throws IOException, ParseException {
         Map<String, Set<String>> ret = new HashMap<String, Set<String>>();
 
         File stats = new File(tmpdir + File.separator + "mining_stats.json"),
