@@ -22,11 +22,7 @@ public class GithubAPIRepoAdapter {
         return _instance;
     }
 
-    public Set<String> listJavaRepositories(String pushedAfter) throws IOException { // ex., pushedAfter = "2020-11-20T08:10:00Z"
-        return listJavaRepositories(pushedAfter, 0, MAX_STARS);
-    }
-
-    public Set<String> listJavaRepositories(String pushedAfter, int min, int max) throws IOException {
+    private Set<String> listJavaRepositories(String pushedAfter, int min, int max) throws IOException {
         Set<String> res = new HashSet<>();
 
         GHRepositorySearchBuilder searchQuery = GAA.g().searchRepositories().language("java")
