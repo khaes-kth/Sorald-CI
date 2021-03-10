@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.kth.castor.ci.githubapi.commits.GithubAPICommitAdapter;
 import se.kth.castor.ci.githubapi.commits.models.SelectedCommit;
+import se.kth.castor.ci.githubapi.repositories.GithubAPIRepoAdapter;
 import se.kth.castor.ci.soraldutils.SoraldCIAdapter;
 
 import java.io.File;
@@ -29,6 +30,7 @@ public class GithubScanner extends Thread {
     private String patchPrintingMode;
     private long frequency;
     private long startTime;
+    private Integer minStars;
 
     public GithubScanner
             (
@@ -39,7 +41,8 @@ public class GithubScanner extends Thread {
                     String tmpdir,
                     String patchPrintingMode,
                     Long frequency,
-                    Long startTime
+                    Long startTime,
+                    Integer minStars
             ) {
         this.fetchMode = fetchMode;
         this.repos = repos;
@@ -50,6 +53,7 @@ public class GithubScanner extends Thread {
         this.lastFetched = new Date().getTime();
         this.frequency = frequency == null ? DEFAULT_FREQUENCY : frequency;
         this.startTime = startTime == null ? new Date().getTime() : startTime;
+        this.minStars = minStars;
     }
 
     @Override
@@ -86,8 +90,11 @@ public class GithubScanner extends Thread {
     }
 
     private List<SelectedCommit> fetch(long startTime, long endTime) throws Exception {
-        return GithubAPICommitAdapter.getInstance()
-                .getSelectedCommits(startTime, endTime, fetchMode, repos, false);
+        return minStars == null ?
+                GithubAPICommitAdapter.getInstance().getSelectedCommits
+                        (startTime, endTime, fetchMode, repos, false) :
+                GithubAPICommitAdapter.getInstance().getSelectedCommits
+                        (startTime, endTime, minStars, GithubAPIRepoAdapter.MAX_STARS, fetchMode, false);
     }
 
     private void process(SelectedCommit commit) throws IOException, GitAPIException, ParseException, InterruptedException {

@@ -45,6 +45,9 @@ public class Application implements ApplicationRunner {
     @Value("${commit.fetch.start.time}")
     private Long commitFetchStartTime;
 
+    @Value("${repos.min.stars}")
+    private Integer reposMinStars;
+
     private File dataFile;
 
     private GithubScanner githubScanner;
@@ -60,7 +63,7 @@ public class Application implements ApplicationRunner {
                 "UTF-8"));
         githubScanner = new GithubScanner(GithubScanner.FetchMode.ALL, repos, dataFile,
                 Arrays.asList(rulesStr.split(",")), tmpdir, patchPrintingMode,
-                commitFetchFrequency, commitFetchStartTime);
+                commitFetchFrequency, commitFetchStartTime, reposMinStars);
         githubScanner.setDaemon(true);
         githubScanner.start();
     }

@@ -102,4 +102,19 @@ public class GithubAPICommitAdapter {
         }
         return selectedCommits;
     }
+
+    public List<SelectedCommit> getSelectedCommits
+            (
+                    long intervalStart,
+                    long intervalEnd,
+                    int minStar,
+                    int maxStar,
+                    GithubScanner.FetchMode fetchMode,
+                    boolean checkGithubActionsFailures
+            ) throws IOException {
+        Set<String> repos = GithubAPIRepoAdapter.getInstance()
+                .listJavaRepositories(intervalStart, minStar, maxStar);
+
+        return getSelectedCommits(intervalStart, intervalEnd, fetchMode, repos, checkGithubActionsFailures);
+    }
 }
