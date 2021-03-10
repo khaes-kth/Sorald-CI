@@ -48,11 +48,14 @@ public class Application implements ApplicationRunner {
     @Value("${repos.min.stars}")
     private Integer reposMinStars;
 
+    @Value("${tokens.path}")
+    private String tokensPath;
+
     private File dataFile;
 
     private GithubScanner githubScanner;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         logger.info("APPLICATION STARTED AT: " + new Date());
         SpringApplication.run(Application.class, args);
     }
@@ -74,6 +77,10 @@ public class Application implements ApplicationRunner {
 
         if(!dataFile.exists())
             dataFile.createNewFile();
+
+        if(tokensPath != null){
+           System.setProperty("tokens.path", tokensPath);
+        }
 
         runDaemons();
     }

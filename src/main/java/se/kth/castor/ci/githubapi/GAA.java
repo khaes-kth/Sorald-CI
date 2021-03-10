@@ -13,7 +13,10 @@ import java.io.IOException;
 public class GAA {
     private static final Logger LOGGER = LoggerFactory.getLogger(GAA.class);
 
-    private static final String TOKENS_PATH = System.getProperty("user.home") + "/Downloads/config.ini";
+    private static final String TOKENS_PATH =
+            System.getProperty("tokens.path") != null ?
+            System.getProperty("tokens.path") :
+            System.getProperty("user.home") + "/Downloads/config.ini";
     private static int lastUsedToken = 0;
 
     public static GitHub g() throws IOException {
