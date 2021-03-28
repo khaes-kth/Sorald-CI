@@ -25,6 +25,7 @@ public class SoraldCLAdapter {
     public static final String MINING_STATS_FILENAME = "mining_stats.json";
     public static final String MINING_TMP_DIR_PATH = "mining_tmp_dir";
     public static final String MINED_RULES_KEY = "minedRules";
+    public static final String PREVIOUS_COMMIT_REF = "HEAD^";
     private static SoraldCLAdapter _instance;
 
     private String tmpdir;
@@ -90,11 +91,11 @@ public class SoraldCLAdapter {
         }
 
         processBuilder =
-                new ProcessBuilder("git", "checkout", "HEAD^")
+                new ProcessBuilder("git", "checkout", PREVIOUS_COMMIT_REF)
                         .directory(copyRepoDir).inheritIO();
         res = startAndWaitForProcess(processBuilder);
         if (res != 0) {
-            logger.error("cannot checkout to head^");
+            logger.error("cannot checkout to " + PREVIOUS_COMMIT_REF);
             return new HashMap<String, Set<String>>();
         }
 
