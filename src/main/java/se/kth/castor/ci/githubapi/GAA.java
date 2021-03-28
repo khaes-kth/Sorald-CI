@@ -15,11 +15,12 @@ public class GAA {
 
     public static final String TOKENS_PATH_PROPERTY_KEY = "tokens.path";
     public static final String USER_HOME_PROPERTY_KEY = "user.home";
+    public static final String TOKENS_RELATIVE_FILE_PATH = "/Downloads/config.ini";
     
     private static final String TOKENS_PATH =
             System.getProperty(TOKENS_PATH_PROPERTY_KEY) != null ?
             System.getProperty(TOKENS_PATH_PROPERTY_KEY) :
-            System.getProperty(USER_HOME_PROPERTY_KEY) + "/Downloads/config.ini";
+            System.getProperty(USER_HOME_PROPERTY_KEY) + TOKENS_RELATIVE_FILE_PATH;
     private static int lastUsedToken = 0;
 
     public static GitHub g() throws IOException {
