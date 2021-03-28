@@ -13,10 +13,11 @@ import java.io.IOException;
 public class GAA {
     private static final Logger LOGGER = LoggerFactory.getLogger(GAA.class);
 
-    public static final String TOKENS_PATH1 = "tokens.path";
+    public static final String TOKENS_PATH_PROPERTY_KEY = "tokens.path";
+    
     private static final String TOKENS_PATH =
-            System.getProperty(TOKENS_PATH1) != null ?
-            System.getProperty(TOKENS_PATH1) :
+            System.getProperty(TOKENS_PATH_PROPERTY_KEY) != null ?
+            System.getProperty(TOKENS_PATH_PROPERTY_KEY) :
             System.getProperty("user.home") + "/Downloads/config.ini";
     private static int lastUsedToken = 0;
 
