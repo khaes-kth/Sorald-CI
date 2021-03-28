@@ -14,11 +14,12 @@ public class GAA {
     private static final Logger LOGGER = LoggerFactory.getLogger(GAA.class);
 
     public static final String TOKENS_PATH_PROPERTY_KEY = "tokens.path";
+    public static final String USER_HOME_PROPERTY_KEY = "user.home";
     
     private static final String TOKENS_PATH =
             System.getProperty(TOKENS_PATH_PROPERTY_KEY) != null ?
             System.getProperty(TOKENS_PATH_PROPERTY_KEY) :
-            System.getProperty("user.home") + "/Downloads/config.ini";
+            System.getProperty(USER_HOME_PROPERTY_KEY) + "/Downloads/config.ini";
     private static int lastUsedToken = 0;
 
     public static GitHub g() throws IOException {
