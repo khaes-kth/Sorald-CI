@@ -23,6 +23,7 @@ import static se.kth.castor.ci.soraldutils.SoraldCIAdapter.SORALD_GIT_PATCHES_DI
 public class SoraldCLAdapter {
     private static final Logger logger = LoggerFactory.getLogger(SoraldCLAdapter.class);
     public static final String MINING_STATS_FILENAME = "mining_stats.json";
+    public static final String MINING_TMP_DIR_PATH = "mining_tmp_dir";
     private static SoraldCLAdapter _instance;
 
     private String tmpdir;
@@ -139,7 +140,7 @@ public class SoraldCLAdapter {
         Map<String, Set<String>> ret = new HashMap<String, Set<String>>();
 
         File stats = new File(tmpdir + File.separator + MINING_STATS_FILENAME),
-                miningTmpFile = new File(tmpdir + File.separator + "mining_tmp_dir");
+                miningTmpFile = new File(tmpdir + File.separator + MINING_TMP_DIR_PATH);
 
         if (stats.exists())
             stats.delete();
