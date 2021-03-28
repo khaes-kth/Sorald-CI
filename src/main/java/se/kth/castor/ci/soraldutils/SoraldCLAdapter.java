@@ -24,6 +24,7 @@ public class SoraldCLAdapter {
     private static final Logger logger = LoggerFactory.getLogger(SoraldCLAdapter.class);
     public static final String MINING_STATS_FILENAME = "mining_stats.json";
     public static final String MINING_TMP_DIR_PATH = "mining_tmp_dir";
+    public static final String MINED_RULES_KEY = "minedRules";
     private static SoraldCLAdapter _instance;
 
     private String tmpdir;
@@ -173,7 +174,7 @@ public class SoraldCLAdapter {
 
         JSONParser parser = new JSONParser();
         JSONObject jo = (JSONObject) parser.parse(new FileReader(stats));
-        JSONArray ja = (JSONArray) jo.get("minedRules");
+        JSONArray ja = (JSONArray) jo.get(MINED_RULES_KEY);
         for (int i = 0; i < ja.size(); i++) {
             Set<String> violationLocations = new HashSet<String>();
 
