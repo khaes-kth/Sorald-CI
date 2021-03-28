@@ -16,7 +16,7 @@ public class GAA {
     public static final String TOKENS_PATH_PROPERTY_KEY = "tokens.path";
     public static final String USER_HOME_PROPERTY_KEY = "user.home";
     public static final String TOKENS_RELATIVE_FILE_PATH = "/Downloads/config.ini";
-    
+
     private static final String TOKENS_PATH =
             System.getProperty(TOKENS_PATH_PROPERTY_KEY) != null ?
             System.getProperty(TOKENS_PATH_PROPERTY_KEY) :
