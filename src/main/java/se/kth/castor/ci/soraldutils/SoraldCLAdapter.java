@@ -82,8 +82,7 @@ public class SoraldCLAdapter {
         ProcessBuilder processBuilder =
                 new ProcessBuilder("git", "stash")
                         .directory(copyRepoDir).inheritIO();
-        Process p = processBuilder.start();
-        int res = p.waitFor();
+        int res = startAndWaitForProcess(processBuilder);
         if (res != 0) {
             logger.error("cannot stash");
             return new HashMap<String, Set<String>>();
@@ -92,8 +91,7 @@ public class SoraldCLAdapter {
         processBuilder =
                 new ProcessBuilder("git", "checkout", "HEAD^")
                         .directory(copyRepoDir).inheritIO();
-        p = processBuilder.start();
-        res = p.waitFor();
+        res = startAndWaitForProcess(processBuilder);
         if (res != 0) {
             logger.error("cannot checkout to head^");
             return new HashMap<String, Set<String>>();
@@ -130,6 +128,11 @@ public class SoraldCLAdapter {
         }
 
         return ret;
+    }
+
+    private int startAndWaitForProcess(ProcessBuilder processBuilder) throws IOException, InterruptedException {
+        Process p = processBuilder.start();
+        return p.waitFor();
     }
 
     /**
