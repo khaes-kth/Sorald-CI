@@ -1,8 +1,0 @@
-name: GitHub Actions Demo
-on: [pull_request]
-jobs:
-  Explore-GitHub-Actions:
-    runs-on: ubuntu-latest
-    steps:
-      - name: File content checker
-        uses: bubriks/file-content-checker@0.1.3
